@@ -5,5 +5,8 @@ export default defineConfig({
     include: ["test/**/*.test.ts"],
     environment: "node",
     testTimeout: 10_000,
+    env: {
+      LOG_LEVEL: "error",
+    },
   },
 });

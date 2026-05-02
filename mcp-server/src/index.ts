@@ -30,7 +30,7 @@ async function main() {
     version: "0.1.0",
   });
 
-  registerStatus(server, config, cache);
+  registerStatus(server, config, cache, auth, http);
   registerGetArticle(server, http);
   registerGetCode(server, http);
   registerGetLoda(server, http);

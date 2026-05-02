@@ -1,0 +1,51 @@
+{
+  "_comment": "Fixture synthétique calée sur SearchResponseDTO. À remplacer par une capture réelle via `bash scripts/capture-fixture.sh POST /search '<body>' search-code-responsabilite`.",
+  "totalResultNumber": 137,
+  "totalArticleResultNumber": 245,
+  "executionTime": 28,
+  "typePagination": "DEFAUT",
+  "results": [
+    {
+      "titles": [
+        {
+          "title": "Code civil",
+          "id": "LEGITEXT000006070721",
+          "cid": "LEGITEXT000006070721",
+          "legalStatus": "VIGUEUR",
+          "nature": "CODE",
+          "startDate": "1804-03-21T00:00:00.000+00:09:21"
+        }
+      ],
+      "sections": [
+        {
+          "id": "LEGISCTA000006136352",
+          "title": "Sous-titre II : De la responsabilité extracontractuelle",
+          "legalStatus": "VIGUEUR",
+          "extracts": [
+            {
+              "id": "LEGIARTI000006417707",
+              "title": "Article 1240",
+              "num": "1240",
+              "values": [
+                "Tout fait quelconque de l'homme, qui cause à autrui un dommage, oblige celui par la faute duquel il est arrivé à le réparer."
+              ],
+              "legalStatus": "VIGUEUR"
+            },
+            {
+              "id": "LEGIARTI000006417710",
+              "title": "Article 1242",
+              "num": "1242",
+              "values": [
+                "On est responsable non seulement du dommage que l'on cause par son propre fait…"
+              ],
+              "legalStatus": "VIGUEUR"
+            }
+          ]
+        }
+      ],
+      "etat": "VIGUEUR",
+      "nature": "CODE",
+      "date": "1804-03-21T00:00:00.000+00:09:21"
+    }
+  ]
+}

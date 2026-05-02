@@ -8,6 +8,7 @@ import { PisteHttpClient } from "./http.js";
 import { ResponseCache } from "./cache.js";
 import { registerStatus } from "./tools/status.js";
 import { registerGetArticle } from "./tools/get-article.js";
+import { registerRecherche } from "./tools/recherche.js";
 import { registerCacheClear } from "./tools/cache-clear.js";
 
 async function main() {
@@ -25,6 +26,7 @@ async function main() {
 
   registerStatus(server, config, cache);
   registerGetArticle(server, http);
+  registerRecherche(server, http);
   registerCacheClear(server, cache);
 
   const transport = new StdioServerTransport();

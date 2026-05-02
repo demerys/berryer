@@ -1,4 +1,4 @@
-import type { Article } from "./schemas.js";
+import type { Article, SearchResponse, SearchResult } from "./schemas.js";
 
 /**
  * Mapper compact pour un Article Légifrance.
@@ -63,6 +63,110 @@ export function summarizeArticle(article: Article): ArticleSummary {
     lienLegifrance: legifranceArticleUrl(article.id),
   };
 }
+
+/* ------------------------------------------------------------------ */
+/*  Search results                                                    */
+/* ------------------------------------------------------------------ */
+
+export interface SearchHit {
+  id: string | undefined;
+  cid: string | undefined;
+  titre: string | undefined;
+  nature: string | undefined;
+  etat: string | undefined;
+  date: string | undefined;
+  num: string | undefined;
+  extraits: string[];
+  lien: string | undefined;
+}
+
+function legifranceLinkForId(id: string | undefined): string | undefined {
+  if (!id) return undefined;
+  if (id.startsWith("LEGITEXT")) return `${LEGIFRANCE_BASE}/codes/texte_lc/${id}/`;
+  if (id.startsWith("LEGIARTI")) return `${LEGIFRANCE_BASE}/codes/article_lc/${id}/`;
+  if (id.startsWith("JORFTEXT")) return `${LEGIFRANCE_BASE}/jorf/id/${id}`;
+  if (id.startsWith("JORFARTI")) return `${LEGIFRANCE_BASE}/jorf/article_jo/${id}`;
+  if (id.startsWith("JURITEXT")) return `${LEGIFRANCE_BASE}/juri/id/${id}`;
+  if (id.startsWith("CETATEXT")) return `${LEGIFRANCE_BASE}/ceta/id/${id}`;
+  if (id.startsWith("CONSTEXT")) return `${LEGIFRANCE_BASE}/cons/id/${id}`;
+  if (id.startsWith("BOI")) return `${LEGIFRANCE_BASE}/circulaire/id/${id}`;
+  if (id.startsWith("KALI")) return `${LEGIFRANCE_BASE}/conv_coll/id/${id}/`;
+  return undefined;
+}
+
+export function summarizeSearchResult(result: SearchResult): SearchHit {
+  const firstTitle = result.titles?.[0];
+  const id = firstTitle?.id ?? firstTitle?.cid;
+  const extraits: string[] = [];
+  if (result.sections) {
+    for (const section of result.sections) {
+      if (!section.extracts) continue;
+      for (const extract of section.extracts) {
+        if (extract.values) {
+          for (const v of extract.values) {
+            if (extraits.length < 3) extraits.push(v);
+          }
+        }
+      }
+    }
+  }
+  return {
+    id,
+    cid: firstTitle?.cid,
+    titre: firstTitle?.title,
+    nature: result.nature ?? firstTitle?.nature,
+    etat: result.etat ?? firstTitle?.legalStatus,
+    date: result.dateSignature ?? result.datePublication ?? firstTitle?.startDate,
+    num: result.num,
+    extraits,
+    lien: legifranceLinkForId(id),
+  };
+}
+
+export function summarizeSearchResponse(resp: SearchResponse): {
+  total: number;
+  hits: SearchHit[];
+} {
+  return {
+    total: resp.totalResultNumber ?? 0,
+    hits: (resp.results ?? []).map(summarizeSearchResult),
+  };
+}
+
+export function formatSearchResultsAsMarkdown(
+  total: number,
+  hits: SearchHit[],
+  fond: string,
+  query: string,
+): string {
+  if (hits.length === 0) {
+    return `**Aucun résultat** pour "${query}" sur le fond ${fond}.`;
+  }
+  const lines: string[] = [];
+  lines.push(`**${total} résultat(s)** pour "${query}" sur le fond ${fond} (top ${hits.length}) :`);
+  lines.push("");
+  hits.forEach((h, i) => {
+    const head = h.titre ?? "(sans titre)";
+    const num = h.num ? `n° ${h.num}` : "";
+    const meta: string[] = [];
+    if (h.nature) meta.push(h.nature);
+    if (h.etat) meta.push(h.etat);
+    if (h.date) meta.push(h.date.slice(0, 10));
+    lines.push(`${i + 1}. **${head}** ${num}`.trim());
+    if (meta.length > 0) lines.push(`   _${meta.join(" · ")}_`);
+    if (h.id) lines.push(`   \`${h.id}\``);
+    for (const ex of h.extraits.slice(0, 2)) {
+      lines.push(`   > ${ex.replace(/\s+/g, " ").slice(0, 200)}${ex.length > 200 ? "…" : ""}`);
+    }
+    if (h.lien) lines.push(`   [Voir](${h.lien})`);
+    lines.push("");
+  });
+  return lines.join("\n");
+}
+
+/* ------------------------------------------------------------------ */
+/*  Article (Markdown)                                                */
+/* ------------------------------------------------------------------ */
 
 /** Format the article summary as Markdown for display in Claude tool output. */
 export function formatArticleAsMarkdown(s: ArticleSummary): string {

@@ -1,0 +1,39 @@
+{
+  "_comment": "Fixture synthétique CIRC (BOFiP). À remplacer par capture réelle.",
+  "totalResultNumber": 18,
+  "totalArticleResultNumber": 18,
+  "executionTime": 32,
+  "typePagination": "DEFAUT",
+  "results": [
+    {
+      "titles": [
+        {
+          "title": "BOI-BNC-DECLA-10 — Régime micro-BNC",
+          "id": "BOI-BNC-DECLA-10",
+          "cid": "BOI-BNC-DECLA-10",
+          "legalStatus": "VIGUEUR",
+          "nature": "CIRC",
+          "startDate": "2024-12-10T00:00:00.000+01:00"
+        }
+      ],
+      "sections": [
+        {
+          "id": "BOI-BNC-DECLA-10-S10",
+          "title": "Champ d'application",
+          "legalStatus": "VIGUEUR",
+          "extracts": [
+            {
+              "values": [
+                "Le régime micro-BNC s'applique de plein droit aux contribuables dont le montant des recettes annuelles n'excède pas le seuil prévu à l'article 102 ter du CGI."
+              ],
+              "legalStatus": "VIGUEUR"
+            }
+          ]
+        }
+      ],
+      "etat": "VIGUEUR",
+      "nature": "CIRC",
+      "dateSignature": "2024-12-10T00:00:00.000+01:00"
+    }
+  ]
+}

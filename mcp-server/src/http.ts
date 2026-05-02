@@ -13,18 +13,25 @@ export class PisteApiError extends Error {
     public path: string,
     public body: string,
   ) {
-    let hint = "";
-    // Cas connu : PISTE renvoie 400 avec un body vide quand son infra a un
-    // hoquet (load balancer qui route vers un DC mal en point, validation
-    // côté gateway qui échoue). Le body de la requête est correct (il marchait
-    // 5 min plus tôt). Solution = retenter dans 30 sec / 1 min.
+    let msg: string;
     if (status === 400 && !body.trim()) {
-      hint =
-        " — Cause probable : hoquet temporaire de l'infrastructure PISTE (passerelle API). Réessayez dans 30-60 secondes. Vérifiez aussi https://status.piste.gouv.fr.";
+      // Cas connu : PISTE renvoie HTTP 400 avec content-length:0 quand sa
+      // passerelle API a un hoquet transitoire. Constaté empiriquement —
+      // une même requête échoue puis remarche 30 secondes plus tard.
+      // CE N'EST PAS UN PROBLÈME DE CREDENTIALS NI DE SOUSCRIPTION.
+      msg = [
+        `Hoquet temporaire de l'infrastructure PISTE sur ${path}.`,
+        `Symptômes observés : HTTP 400 avec content-length:0, identique à un body valide qui marche normalement.`,
+        `IMPORTANT : ce n'est PAS un 403, PAS un problème de credentials, PAS un problème de souscription Légifrance.`,
+        `La passerelle API DILA rejette parfois sporadiquement les requêtes valides ; le plugin a déjà retenté automatiquement.`,
+        `Action recommandée : reposer la même question dans 30-60 secondes (le service revient en quelques minutes). Statut PISTE : https://status.piste.gouv.fr/.`,
+      ].join(" ");
     } else if (status === 400) {
-      hint = " — Le format de la requête est invalide (Légifrance/PISTE).";
+      msg = `PISTE/Légifrance HTTP 400 sur ${path}: ${body.slice(0, 300)} — format de requête invalide.`;
+    } else {
+      msg = `PISTE/Légifrance HTTP ${status} sur ${path}: ${body.slice(0, 300)}`;
     }
-    super(`PISTE/Légifrance ${status} sur ${path}: ${body.slice(0, 300)}${hint}`);
+    super(msg);
     this.name = "PisteApiError";
   }
 }
@@ -137,11 +144,16 @@ export class PisteHttpClient {
       // PISTE renvoie sporadiquement HTTP 400 avec un body vide quand la
       // passerelle API a un hoquet transitoire (constaté en prod). Le body
       // de la requête est valide — il marche 30 secondes plus tard.
-      // On retry une fois avec un délai bref.
-      if (res.statusCode === 400 && !text.trim() && attempt400Empty === 0) {
-        log.warn("piste api 400 empty body, retry once after 1s", { path });
+      // On retry jusqu'à 3 fois avec backoff (1s, 3s, 8s).
+      if (res.statusCode === 400 && !text.trim() && attempt400Empty < 3) {
+        const delay = [1000, 3000, 8000][attempt400Empty]!;
+        log.warn("piste api 400 empty body, retry with backoff", {
+          path,
+          attempt: attempt400Empty + 1,
+          delayMs: delay,
+        });
         attempt400Empty += 1;
-        await this.sleep(1000);
+        await this.sleep(delay);
         continue;
       }
 

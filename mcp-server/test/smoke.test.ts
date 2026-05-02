@@ -54,7 +54,7 @@ function sendAndCollect(messages: object[], timeoutMs = 5000): Promise<JsonRpcRe
 }
 
 describe("berryer mcp server — smoke", () => {
-  it("expose le tool piste_status via tools/list", async () => {
+  it("expose les tools attendus via tools/list", async () => {
     const init = {
       jsonrpc: "2.0",
       id: 1,
@@ -73,6 +73,7 @@ describe("berryer mcp server — smoke", () => {
     const result = listResp.result as { tools: { name: string }[] };
     const names = result.tools.map((t) => t.name);
     expect(names).toContain("piste_status");
+    expect(names).toContain("legifrance_get_article");
   });
 
   it("appelle piste_status et reçoit un JSON valide", async () => {

@@ -1,0 +1,20 @@
+{
+  "_comment": "Fixture synthétique calée sur le schéma Swagger Article. À remplacer par une capture réelle via `bash scripts/capture-fixture.sh POST /consult/getArticle '{\"id\":\"LEGIARTI000006417707\"}' article-1240-code-civil` dès que des credentials PISTE sont disponibles.",
+  "article": {
+    "id": "LEGIARTI000006417707",
+    "cid": "LEGIARTI000006417707",
+    "num": "1240",
+    "texte": "Tout fait quelconque de l'homme, qui cause à autrui un dommage, oblige celui par la faute duquel il est arrivé à le réparer.",
+    "texteHtml": "<p>Tout fait quelconque de l'homme, qui cause à autrui un dommage, oblige celui par la faute duquel il est arrivé à le réparer.</p>",
+    "nature": "Article",
+    "etat": "VIGUEUR",
+    "dateDebut": "2016-10-01T00:00:00.000+02:00",
+    "dateFin": "2999-01-01T00:00:00.000+01:00",
+    "versionArticle": "1.0",
+    "sectionParentTitre": "Sous-titre II : De la responsabilité extracontractuelle",
+    "idTexte": "LEGITEXT000006070721",
+    "cidTexte": "LEGITEXT000006070721"
+  },
+  "executionTime": 12,
+  "dereferenced": false
+}

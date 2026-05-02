@@ -8,7 +8,13 @@ import { PisteHttpClient } from "./http.js";
 import { ResponseCache } from "./cache.js";
 import { registerStatus } from "./tools/status.js";
 import { registerGetArticle } from "./tools/get-article.js";
+import { registerGetCode } from "./tools/get-code.js";
+import { registerGetLoda } from "./tools/get-loda.js";
+import { registerGetJurisprudence } from "./tools/get-jurisprudence.js";
+import { registerGetJorf } from "./tools/get-jorf.js";
+import { registerGetCirculaire } from "./tools/get-circulaire.js";
 import { registerRecherche } from "./tools/recherche.js";
+import { registerSuggest } from "./tools/suggest.js";
 import { registerCacheClear } from "./tools/cache-clear.js";
 
 async function main() {
@@ -26,7 +32,13 @@ async function main() {
 
   registerStatus(server, config, cache);
   registerGetArticle(server, http);
+  registerGetCode(server, http);
+  registerGetLoda(server, http);
+  registerGetJurisprudence(server, http);
+  registerGetJorf(server, http);
+  registerGetCirculaire(server, http);
   registerRecherche(server, http);
+  registerSuggest(server, http);
   registerCacheClear(server, cache);
 
   const transport = new StdioServerTransport();

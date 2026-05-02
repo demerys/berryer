@@ -126,3 +126,173 @@ export const SearchResponseSchema = z
 
 export type SearchResponse = z.infer<typeof SearchResponseSchema>;
 export type SearchResult = z.infer<typeof SearchResultSchema>;
+
+/* ------------------------------------------------------------------ */
+/*  Consult — tolérant (passthrough) pour absorber la richesse des    */
+/*  réponses Légifrance sans tout typer.                              */
+/* ------------------------------------------------------------------ */
+
+const ConsultArticleStub = z
+  .object({
+    id: z.string().optional(),
+    cid: z.string().optional(),
+    num: z.string().optional(),
+    intOrdre: z.number().optional(),
+  })
+  .passthrough();
+
+const ConsultSectionStub: z.ZodType<{ id?: string; title?: string }> = z.lazy(() =>
+  z
+    .object({
+      id: z.string().optional(),
+      cid: z.string().optional(),
+      title: z.string().optional(),
+      etat: z.string().optional(),
+      articles: z.array(ConsultArticleStub).optional(),
+      sections: z.array(ConsultSectionStub).optional(),
+    })
+    .passthrough(),
+);
+
+/** Réponse /consult/code et /consult/lawDecree (LODA). */
+export const ConsultTextResponseSchema = z
+  .object({
+    id: z.string().optional(),
+    cid: z.string().optional(),
+    title: z.string().optional(),
+    titreLong: z.string().optional(),
+    nature: z.string().optional(),
+    etat: z.string().optional(),
+    dateDebut: z.string().optional(),
+    dateFin: z.string().optional(),
+    dateParution: z.string().optional(),
+    eli: z.string().optional(),
+    nor: z.string().optional(),
+    resume: z.string().optional(),
+    articles: z.array(ConsultArticleStub).optional(),
+    sections: z.array(ConsultSectionStub).optional(),
+    executionTime: z.number().optional(),
+  })
+  .passthrough();
+
+export type ConsultTextResponse = z.infer<typeof ConsultTextResponseSchema>;
+
+/** Réponse /consult/jorf. */
+export const ConsultJorfResponseSchema = z
+  .object({
+    id: z.string().optional(),
+    title: z.string().optional(),
+    textNumber: z.string().optional(),
+    nature: z.string().optional(),
+    dateTexte: z.string().optional(),
+    resume: z.string().optional(),
+    notice: z.string().optional(),
+    nor: z.string().optional(),
+    articles: z.array(ConsultArticleStub).optional(),
+    sections: z.array(ConsultSectionStub).optional(),
+  })
+  .passthrough();
+
+export type ConsultJorfResponse = z.infer<typeof ConsultJorfResponseSchema>;
+
+/** Sous-schéma /consult/juri (texte d'une décision judiciaire). */
+const TexteSimpleSchema = z
+  .object({
+    id: z.string().optional(),
+    cid: z.string().optional(),
+    titre: z.string().optional(),
+    titreLong: z.string().optional(),
+    nature: z.string().optional(),
+    etat: z.string().optional(),
+    dateTexte: z.string().optional(),
+    dateDebut: z.string().optional(),
+    texteHtml: z.string().optional(),
+    visas: z.string().optional(),
+    notice: z.string().optional(),
+    juridiction: z.string().optional(),
+    formation: z.string().optional(),
+    numero: z.string().optional(),
+    solution: z.string().optional(),
+    sommaire: z.string().optional(),
+  })
+  .passthrough();
+
+export const ConsultJuriResponseSchema = z
+  .object({
+    text: TexteSimpleSchema.nullable().optional(),
+    executionTime: z.number().optional(),
+    dereferenced: z.boolean().optional(),
+  })
+  .passthrough();
+
+export type ConsultJuriResponse = z.infer<typeof ConsultJuriResponseSchema>;
+
+/** Sous-schéma /consult/circulaire (BOFiP). */
+const CirculaireSchema = z
+  .object({
+    id: z.string().optional(),
+    titre: z.string().optional(),
+    nor: z.string().optional(),
+    etat: z.string().optional(),
+    dateOpposabilite: z.string().optional(),
+    dateSignature: z.string().optional(),
+    dateTexte: z.string().optional(),
+    resume: z.string().optional(),
+    motsCles: z.array(z.string()).optional(),
+    ministeresDeposants: z.array(z.string()).optional(),
+    texteHtml: z.string().optional(),
+  })
+  .passthrough();
+
+export const ConsultCirculaireResponseSchema = z
+  .object({
+    circulaire: CirculaireSchema.nullable().optional(),
+    executionTime: z.number().optional(),
+    dereferenced: z.boolean().optional(),
+  })
+  .passthrough();
+
+export type ConsultCirculaireResponse = z.infer<typeof ConsultCirculaireResponseSchema>;
+
+/* ------------------------------------------------------------------ */
+/*  Suggest                                                           */
+/* ------------------------------------------------------------------ */
+
+export const SUGGEST_SUPPLIES = [
+  "ALL",
+  "ALL_SUGGEST",
+  "LODA_LIST",
+  "CODE_LIST",
+  "CODE_RELEASE_DATE",
+  "JURI",
+  "CETAT",
+  "JORF",
+  "CIRC",
+  "ACCO",
+  "KALI",
+  "CONSTIT",
+  "CNIL",
+  "ARTICLE",
+] as const;
+
+export const SuggestValueSchema = z
+  .object({
+    id: z.string().optional(),
+    label: z.string().optional(),
+    nature: z.string().optional(),
+    origin: z.string().optional(),
+    dateVersion: z.string().optional(),
+    appellations: z.array(z.string()).optional(),
+  })
+  .passthrough();
+
+export const SuggestResponseSchema = z
+  .object({
+    totalResultNumber: z.number().optional(),
+    executionTime: z.number().optional(),
+    /** results: { [supply]: { [id]: SuggestValue } } — Map of Map. */
+    results: z.record(z.string(), z.record(z.string(), SuggestValueSchema)).optional(),
+  })
+  .passthrough();
+
+export type SuggestResponse = z.infer<typeof SuggestResponseSchema>;

@@ -72,8 +72,21 @@ describe("berryer mcp server — smoke", () => {
     expect(listResp.error).toBeUndefined();
     const result = listResp.result as { tools: { name: string }[] };
     const names = result.tools.map((t) => t.name);
-    expect(names).toContain("piste_status");
-    expect(names).toContain("legifrance_get_article");
+    const expected = [
+      "piste_status",
+      "piste_cache_clear",
+      "legifrance_recherche",
+      "legifrance_get_article",
+      "legifrance_get_code",
+      "legifrance_get_loda",
+      "legifrance_get_jurisprudence",
+      "legifrance_get_jorf",
+      "legifrance_get_circulaire",
+      "legifrance_suggest",
+    ];
+    for (const name of expected) {
+      expect(names, `tool ${name} missing`).toContain(name);
+    }
   });
 
   it("appelle piste_status et reçoit un JSON valide", async () => {

@@ -5,27 +5,39 @@ import { loadConfig } from "./config.js";
 import { log } from "./logger.js";
 import { PisteClient } from "./piste-client.js";
 import { PisteHttpClient } from "./http.js";
+import { ResponseCache } from "./cache.js";
 import { registerStatus } from "./tools/status.js";
 import { registerGetArticle } from "./tools/get-article.js";
+import { registerCacheClear } from "./tools/cache-clear.js";
 
 async function main() {
   const config = loadConfig();
   log.info("berryer mcp server starting", { env: config.env });
 
+  const cache = new ResponseCache({ path: `${config.cacheDir}/cache.db` });
   const auth = new PisteClient(config);
-  const http = new PisteHttpClient(config, auth);
+  const http = new PisteHttpClient(config, auth, { cache });
 
   const server = new McpServer({
     name: "berryer",
     version: "0.1.0",
   });
 
-  registerStatus(server, config);
+  registerStatus(server, config, cache);
   registerGetArticle(server, http);
+  registerCacheClear(server, cache);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
   log.info("berryer mcp server connected");
+
+  const shutdown = () => {
+    log.info("berryer mcp server shutting down");
+    cache.close();
+    process.exit(0);
+  };
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
 
 main().catch((err) => {

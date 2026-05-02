@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { MockAgent, setGlobalDispatcher } from "undici";
 import { PisteClient } from "../src/piste-client.js";
 import { PisteHttpClient, PisteApiError, PisteForbiddenError } from "../src/http.js";
+import { ResponseCache } from "../src/cache.js";
 import type { Config } from "../src/config.js";
 
 const config: Config = {
@@ -90,6 +91,25 @@ describe("PisteHttpClient — gestion des erreurs et retries", () => {
     const res = await http.post<{ results: unknown[] }>("/search", {});
     expect(res.results).toEqual([]);
     expect(sleeps).toEqual([1000, 2000]); // exponential backoff: 2^0, 2^1
+  });
+
+  it("cache hit : 2e appel n'atteint pas le réseau", async () => {
+    // L'intercept ne répond qu'une fois. Si http.post fait un 2e appel, ça plantera.
+    agent
+      .get("https://api.piste.gouv.fr")
+      .intercept({ path: "/dila/legifrance/lf-engine-app/consult/getArticle", method: "POST" })
+      .reply(200, { article: { id: "X" } });
+
+    const auth = new PisteClient(config, agent);
+    const cache = new ResponseCache({ path: ":memory:" });
+    const http = new PisteHttpClient(config, auth, { dispatcher: agent, cache });
+
+    const r1 = await http.post<{ article: { id: string } }>("/consult/getArticle", { id: "X" });
+    const r2 = await http.post<{ article: { id: string } }>("/consult/getArticle", { id: "X" });
+    expect(r1.article.id).toBe("X");
+    expect(r2.article.id).toBe("X");
+    expect(cache.stats()).toMatchObject({ totalRows: 1, hits: 1 });
+    cache.close();
   });
 
   it("retry sur 5xx (1 fois) puis remonte l'erreur si 2e échec", async () => {

@@ -2,6 +2,7 @@ import { request, type Dispatcher } from "undici";
 import { log } from "./logger.js";
 import type { Config } from "./config.js";
 import type { PisteClient } from "./piste-client.js";
+import { ResponseCache, defaultTtlForPath } from "./cache.js";
 
 const MAX_RETRIES_429 = 3;
 const RETRY_5XX_DELAY_MS = 2000;
@@ -31,6 +32,15 @@ export interface HttpClientOptions {
   dispatcher?: Dispatcher;
   /** Override the sleep function (for tests). */
   sleep?: (ms: number) => Promise<void>;
+  /** Optional response cache. */
+  cache?: ResponseCache;
+}
+
+export interface RequestOptions {
+  /** Skip the cache lookup (still writes to cache on success). */
+  bypassCache?: boolean;
+  /** Override the default TTL (ms). */
+  ttlMs?: number;
 }
 
 const defaultSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -38,6 +48,7 @@ const defaultSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 export class PisteHttpClient {
   private dispatcher?: Dispatcher;
   private sleep: (ms: number) => Promise<void>;
+  cache?: ResponseCache;
 
   constructor(
     private config: Config,
@@ -46,21 +57,38 @@ export class PisteHttpClient {
   ) {
     this.dispatcher = opts.dispatcher;
     this.sleep = opts.sleep ?? defaultSleep;
+    this.cache = opts.cache;
   }
 
   /**
    * POST a JSON body to the Légifrance API.
    * Handles auth (bearer token), 401 re-auth, 403 friendly error, 429 backoff, 5xx retry.
    */
-  async post<T = unknown>(path: string, body: unknown): Promise<T> {
-    return this.callJson<T>("POST", path, body);
+  async post<T = unknown>(path: string, body: unknown, opts: RequestOptions = {}): Promise<T> {
+    return this.callJson<T>("POST", path, body, opts);
   }
 
-  async get<T = unknown>(path: string): Promise<T> {
-    return this.callJson<T>("GET", path, undefined);
+  async get<T = unknown>(path: string, opts: RequestOptions = {}): Promise<T> {
+    return this.callJson<T>("GET", path, undefined, opts);
   }
 
-  private async callJson<T>(method: "GET" | "POST", path: string, body: unknown): Promise<T> {
+  private async callJson<T>(
+    method: "GET" | "POST",
+    path: string,
+    body: unknown,
+    opts: RequestOptions,
+  ): Promise<T> {
+    const cacheKey = `${method} ${path}`;
+    const paramsHash = this.cache ? ResponseCache.hash(body ?? null) : "";
+
+    if (this.cache && !opts.bypassCache) {
+      const cached = this.cache.get<T>(cacheKey, paramsHash);
+      if (cached !== undefined) {
+        log.debug("cache hit", { method, path });
+        return cached;
+      }
+    }
+
     const url = `${this.config.apiBaseUrl}${path}`;
     let attempt429 = 0;
     let attempt401 = 0;
@@ -85,7 +113,12 @@ export class PisteHttpClient {
 
       if (res.statusCode === 200 || res.statusCode === 201) {
         log.debug("piste api ok", { method, path, status: res.statusCode, ms: elapsedMs });
-        return text ? (JSON.parse(text) as T) : (undefined as T);
+        const parsed = text ? (JSON.parse(text) as T) : (undefined as T);
+        if (this.cache && parsed !== undefined) {
+          const ttl = opts.ttlMs ?? defaultTtlForPath(path);
+          this.cache.set(cacheKey, paramsHash, parsed, ttl);
+        }
+        return parsed;
       }
 
       if (res.statusCode === 401 && attempt401 === 0) {

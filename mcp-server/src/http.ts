@@ -143,10 +143,11 @@ export class PisteHttpClient {
 
       // PISTE renvoie sporadiquement HTTP 400 avec un body vide quand la
       // passerelle API a un hoquet transitoire (constaté en prod). Le body
-      // de la requête est valide — il marche 30 secondes plus tard.
-      // On retry jusqu'à 3 fois avec backoff (1s, 3s, 8s).
-      if (res.statusCode === 400 && !text.trim() && attempt400Empty < 3) {
-        const delay = [1000, 3000, 8000][attempt400Empty]!;
+      // de la requête est valide — il marche 10-30 secondes plus tard.
+      // On retry jusqu'à 5 fois avec backoff (1s, 3s, 6s, 12s, 20s = 42s total).
+      if (res.statusCode === 400 && !text.trim() && attempt400Empty < 5) {
+        const delays = [1000, 3000, 6000, 12000, 20000];
+        const delay = delays[attempt400Empty]!;
         log.warn("piste api 400 empty body, retry with backoff", {
           path,
           attempt: attempt400Empty + 1,

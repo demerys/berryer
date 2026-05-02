@@ -36,6 +36,12 @@ Distribution via le repo marketplace `demerys/jurisconsultes-marketplace` (à cr
 - Endpoints prod vs sandbox : voir §3.3
 - **Ne pas typer les réponses PISTE depuis la doc seule** : faire un appel réel avec un vrai token et inspecter avant de figer les schémas Zod (instruction explicite du spec §14.6)
 - Cache obligatoire avant d'ajouter beaucoup de tools (rate limits PISTE serrés, requêtes répétitives)
+- **Syntaxe d'interpolation `.mcp.json`** : utiliser `${VAR}` et **PAS** `${env:VAR}` (la spec §2.3 a la mauvaise syntaxe). Source : https://code.claude.com/docs/en/mcp.md. Sans `env:` les substitutions échouent silencieusement et la string littérale `${env:PISTE_CLIENT_ID}` est passée à PISTE qui rejette en 403, donnant l'illusion d'un problème de souscription.
+
+## PISTE — bugs infrastructure connus
+
+- **HTTP 400 avec content-length:0 sur /search** : la passerelle DILA renvoie sporadiquement des 400 vides sur des bodies parfaitement valides (constaté en mai 2026). Durée typique des hoquets : 10-60 sec. Le plugin retry jusqu'à 5 fois avec backoff exponentiel (42 sec total). `PisteApiError` cas 400+empty est explicitement marqué "ce n'est PAS un 403, PAS un problème de credentials" pour empêcher les agents de mal interpréter.
+- **Datacenters multi-routés** : le LB DILA route entre `rbx` (Roubaix) et `sbg` (Strasbourg). Un DC peut être plus instable que l'autre.
 
 ## Tools MCP V1 (8 tools)
 

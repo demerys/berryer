@@ -4,9 +4,9 @@
       "command": "node",
       "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/dist/index.js"],
       "env": {
-        "PISTE_CLIENT_ID": "${env:PISTE_CLIENT_ID}",
-        "PISTE_CLIENT_SECRET": "${env:PISTE_CLIENT_SECRET}",
-        "PISTE_ENV": "${env:PISTE_ENV:-production}",
+        "PISTE_CLIENT_ID": "${PISTE_CLIENT_ID}",
+        "PISTE_CLIENT_SECRET": "${PISTE_CLIENT_SECRET}",
+        "PISTE_ENV": "${PISTE_ENV:-production}",
         "CACHE_DIR": "${CLAUDE_PLUGIN_ROOT}/.cache"
       }
     }

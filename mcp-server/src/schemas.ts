@@ -9,24 +9,62 @@ import { z } from "zod";
  * sera détecté par les tests fixtures (capturés via `scripts/capture-fixture.sh`).
  */
 
+/**
+ * Date issue de l'API Légifrance — soit un timestamp epoch en ms (number),
+ * soit une chaîne ISO. La plupart des endpoints renvoient des numbers, mais
+ * certains champs / certains fonds renvoient des strings.
+ */
+export const LegiDateSchema = z.union([z.number(), z.string()]).nullable().optional();
+
 /** Sous-ensemble du schéma `Article` (Swagger Légifrance). */
 export const ArticleSchema = z
   .object({
-    id: z.string().optional(),
-    cid: z.string().optional(),
-    num: z.string().optional(),
-    texte: z.string().optional(),
-    texteHtml: z.string().optional(),
-    nature: z.string().optional(),
-    etat: z.string().optional(),
-    dateDebut: z.string().optional(),
-    dateFin: z.string().optional(),
-    versionArticle: z.string().optional(),
-    sectionParentTitre: z.string().optional(),
-    idTexte: z.string().optional(),
-    cidTexte: z.string().optional(),
-    nota: z.string().optional(),
-    notaHtml: z.string().optional(),
+    id: z.string().nullable().optional(),
+    cid: z.string().nullable().optional(),
+    num: z.string().nullable().optional(),
+    texte: z.string().nullable().optional(),
+    texteHtml: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    etat: z.string().nullable().optional(),
+    dateDebut: LegiDateSchema,
+    dateFin: LegiDateSchema,
+    versionArticle: z.string().nullable().optional(),
+    sectionParentTitre: z.string().nullable().optional(),
+    idTexte: z.string().nullable().optional(),
+    cidTexte: z.string().nullable().optional(),
+    nota: z.string().nullable().optional(),
+    notaHtml: z.string().nullable().optional(),
+    /** Contexte hiérarchique (titresTM, titreTxt). Présent dans /consult/getArticle. */
+    context: z
+      .object({
+        titreTxt: z
+          .array(
+            z
+              .object({
+                titre: z.string().nullable().optional(),
+                cid: z.string().nullable().optional(),
+                id: z.string().nullable().optional(),
+              })
+              .passthrough(),
+          )
+          .nullable()
+          .optional(),
+        titresTM: z
+          .array(
+            z
+              .object({
+                titre: z.string().nullable().optional(),
+                cid: z.string().nullable().optional(),
+                id: z.string().nullable().optional(),
+              })
+              .passthrough(),
+          )
+          .nullable()
+          .optional(),
+      })
+      .passthrough()
+      .nullable()
+      .optional(),
   })
   .passthrough();
 
@@ -66,51 +104,51 @@ export type Fond = (typeof FOND_VALUES)[number];
 
 export const SearchTitleSchema = z
   .object({
-    title: z.string().optional(),
-    id: z.string().optional(),
-    cid: z.string().optional(),
-    legalStatus: z.string().optional(),
-    nature: z.string().optional(),
-    startDate: z.string().optional(),
-    endDate: z.string().optional(),
+    title: z.string().nullable().optional(),
+    id: z.string().nullable().optional(),
+    cid: z.string().nullable().optional(),
+    legalStatus: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    startDate: LegiDateSchema,
+    endDate: LegiDateSchema,
   })
   .passthrough();
 
 export const SearchExtractSchema = z
   .object({
-    id: z.string().optional(),
-    title: z.string().optional(),
-    num: z.string().optional(),
-    values: z.array(z.string()).optional(),
-    legalStatus: z.string().optional(),
-    dateVersion: z.string().optional(),
+    id: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    num: z.string().nullable().optional(),
+    values: z.array(z.string()).nullable().optional(),
+    legalStatus: z.string().nullable().optional(),
+    dateVersion: LegiDateSchema,
   })
   .passthrough();
 
 export const SearchSectionSchema = z
   .object({
-    id: z.string().optional(),
-    title: z.string().optional(),
-    dateVersion: z.string().optional(),
-    legalStatus: z.string().optional(),
-    extracts: z.array(SearchExtractSchema).optional(),
+    id: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    dateVersion: LegiDateSchema,
+    legalStatus: z.string().nullable().optional(),
+    extracts: z.array(SearchExtractSchema).nullable().optional(),
   })
   .passthrough();
 
 export const SearchResultSchema = z
   .object({
-    titles: z.array(SearchTitleSchema).optional(),
-    sections: z.array(SearchSectionSchema).optional(),
-    nor: z.string().optional(),
-    etat: z.string().optional(),
-    nature: z.string().optional(),
-    type: z.string().optional(),
-    date: z.string().optional(),
-    dateSignature: z.string().optional(),
-    datePublication: z.string().optional(),
-    num: z.string().optional(),
-    reference: z.string().optional(),
-    text: z.string().optional(),
+    titles: z.array(SearchTitleSchema).nullable().optional(),
+    sections: z.array(SearchSectionSchema).nullable().optional(),
+    nor: z.string().nullable().optional(),
+    etat: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    type: z.string().nullable().optional(),
+    date: LegiDateSchema,
+    dateSignature: LegiDateSchema,
+    datePublication: LegiDateSchema,
+    num: z.string().nullable().optional(),
+    reference: z.string().nullable().optional(),
+    text: z.string().nullable().optional(),
   })
   .passthrough();
 
@@ -157,20 +195,20 @@ const ConsultSectionStub: z.ZodType<{ id?: string; title?: string }> = z.lazy(()
 /** Réponse /consult/code et /consult/lawDecree (LODA). */
 export const ConsultTextResponseSchema = z
   .object({
-    id: z.string().optional(),
-    cid: z.string().optional(),
-    title: z.string().optional(),
-    titreLong: z.string().optional(),
-    nature: z.string().optional(),
-    etat: z.string().optional(),
-    dateDebut: z.string().optional(),
-    dateFin: z.string().optional(),
-    dateParution: z.string().optional(),
-    eli: z.string().optional(),
-    nor: z.string().optional(),
-    resume: z.string().optional(),
-    articles: z.array(ConsultArticleStub).optional(),
-    sections: z.array(ConsultSectionStub).optional(),
+    id: z.string().nullable().optional(),
+    cid: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    titreLong: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    etat: z.string().nullable().optional(),
+    dateDebut: LegiDateSchema,
+    dateFin: LegiDateSchema,
+    dateParution: LegiDateSchema,
+    eli: z.string().nullable().optional(),
+    nor: z.string().nullable().optional(),
+    resume: z.string().nullable().optional(),
+    articles: z.array(ConsultArticleStub).nullable().optional(),
+    sections: z.array(ConsultSectionStub).nullable().optional(),
     executionTime: z.number().optional(),
   })
   .passthrough();
@@ -180,16 +218,16 @@ export type ConsultTextResponse = z.infer<typeof ConsultTextResponseSchema>;
 /** Réponse /consult/jorf. */
 export const ConsultJorfResponseSchema = z
   .object({
-    id: z.string().optional(),
-    title: z.string().optional(),
-    textNumber: z.string().optional(),
-    nature: z.string().optional(),
-    dateTexte: z.string().optional(),
-    resume: z.string().optional(),
-    notice: z.string().optional(),
-    nor: z.string().optional(),
-    articles: z.array(ConsultArticleStub).optional(),
-    sections: z.array(ConsultSectionStub).optional(),
+    id: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    textNumber: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    dateTexte: LegiDateSchema,
+    resume: z.string().nullable().optional(),
+    notice: z.string().nullable().optional(),
+    nor: z.string().nullable().optional(),
+    articles: z.array(ConsultArticleStub).nullable().optional(),
+    sections: z.array(ConsultSectionStub).nullable().optional(),
   })
   .passthrough();
 
@@ -198,22 +236,22 @@ export type ConsultJorfResponse = z.infer<typeof ConsultJorfResponseSchema>;
 /** Sous-schéma /consult/juri (texte d'une décision judiciaire). */
 const TexteSimpleSchema = z
   .object({
-    id: z.string().optional(),
-    cid: z.string().optional(),
-    titre: z.string().optional(),
-    titreLong: z.string().optional(),
-    nature: z.string().optional(),
-    etat: z.string().optional(),
-    dateTexte: z.string().optional(),
-    dateDebut: z.string().optional(),
-    texteHtml: z.string().optional(),
-    visas: z.string().optional(),
-    notice: z.string().optional(),
-    juridiction: z.string().optional(),
-    formation: z.string().optional(),
-    numero: z.string().optional(),
-    solution: z.string().optional(),
-    sommaire: z.string().optional(),
+    id: z.string().nullable().optional(),
+    cid: z.string().nullable().optional(),
+    titre: z.string().nullable().optional(),
+    titreLong: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    etat: z.string().nullable().optional(),
+    dateTexte: LegiDateSchema,
+    dateDebut: LegiDateSchema,
+    texteHtml: z.string().nullable().optional(),
+    visas: z.string().nullable().optional(),
+    notice: z.string().nullable().optional(),
+    juridiction: z.string().nullable().optional(),
+    formation: z.string().nullable().optional(),
+    numero: z.string().nullable().optional(),
+    solution: z.string().nullable().optional(),
+    sommaire: z.string().nullable().optional(),
   })
   .passthrough();
 
@@ -230,17 +268,17 @@ export type ConsultJuriResponse = z.infer<typeof ConsultJuriResponseSchema>;
 /** Sous-schéma /consult/circulaire (BOFiP). */
 const CirculaireSchema = z
   .object({
-    id: z.string().optional(),
-    titre: z.string().optional(),
-    nor: z.string().optional(),
-    etat: z.string().optional(),
-    dateOpposabilite: z.string().optional(),
-    dateSignature: z.string().optional(),
-    dateTexte: z.string().optional(),
-    resume: z.string().optional(),
-    motsCles: z.array(z.string()).optional(),
-    ministeresDeposants: z.array(z.string()).optional(),
-    texteHtml: z.string().optional(),
+    id: z.string().nullable().optional(),
+    titre: z.string().nullable().optional(),
+    nor: z.string().nullable().optional(),
+    etat: z.string().nullable().optional(),
+    dateOpposabilite: LegiDateSchema,
+    dateSignature: LegiDateSchema,
+    dateTexte: LegiDateSchema,
+    resume: z.string().nullable().optional(),
+    motsCles: z.array(z.string()).nullable().optional(),
+    ministeresDeposants: z.array(z.string()).nullable().optional(),
+    texteHtml: z.string().nullable().optional(),
   })
   .passthrough();
 
@@ -277,12 +315,12 @@ export const SUGGEST_SUPPLIES = [
 
 export const SuggestValueSchema = z
   .object({
-    id: z.string().optional(),
-    label: z.string().optional(),
-    nature: z.string().optional(),
-    origin: z.string().optional(),
-    dateVersion: z.string().optional(),
-    appellations: z.array(z.string()).optional(),
+    id: z.string().nullable().optional(),
+    label: z.string().nullable().optional(),
+    nature: z.string().nullable().optional(),
+    origin: z.string().nullable().optional(),
+    dateVersion: LegiDateSchema,
+    appellations: z.array(z.string()).nullable().optional(),
   })
   .passthrough();
 

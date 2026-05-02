@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
 import { ConsultCirculaireResponseSchema } from "../schemas.js";
+import { normalizeLegiDate } from "../format.js";
 import { log } from "../logger.js";
 
 function htmlToText(html: string): string {
@@ -57,8 +58,10 @@ export function registerGetCirculaire(server: McpServer, http: PisteHttpClient) 
       lines.push(`# ${c.titre ?? "(sans titre)"}`);
       const meta: string[] = [];
       if (c.etat) meta.push(`État : ${c.etat}`);
-      if (c.dateOpposabilite) meta.push(`Opposable depuis ${c.dateOpposabilite.slice(0, 10)}`);
-      if (c.dateSignature) meta.push(`Signée le ${c.dateSignature.slice(0, 10)}`);
+      const dateOpp = normalizeLegiDate(c.dateOpposabilite);
+      const dateSign = normalizeLegiDate(c.dateSignature);
+      if (dateOpp) meta.push(`Opposable depuis ${dateOpp}`);
+      if (dateSign) meta.push(`Signée le ${dateSign}`);
       if (c.nor) meta.push(`NOR : ${c.nor}`);
       if (c.ministeresDeposants && c.ministeresDeposants.length) {
         meta.push(`Ministère(s) : ${c.ministeresDeposants.join(", ")}`);

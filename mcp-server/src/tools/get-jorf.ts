@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
 import { ConsultJorfResponseSchema } from "../schemas.js";
+import { normalizeLegiDate } from "../format.js";
 import { log } from "../logger.js";
 
 export function registerGetJorf(server: McpServer, http: PisteHttpClient) {
@@ -30,7 +31,8 @@ export function registerGetJorf(server: McpServer, http: PisteHttpClient) {
       lines.push(`# ${d.title ?? "(sans titre)"}`);
       const meta: string[] = [];
       if (d.nature) meta.push(d.nature);
-      if (d.dateTexte) meta.push(d.dateTexte.slice(0, 10));
+      const dateTexte = normalizeLegiDate(d.dateTexte);
+      if (dateTexte) meta.push(dateTexte);
       if (d.textNumber) meta.push(`Texte n° ${d.textNumber}`);
       if (d.nor) meta.push(`NOR : ${d.nor}`);
       if (meta.length) lines.push(`_${meta.join(" · ")}_\n`);

@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
 import { SUGGEST_SUPPLIES, SuggestResponseSchema } from "../schemas.js";
+import { normalizeLegiDate } from "../format.js";
 import { log } from "../logger.js";
 
 export function registerSuggest(server: McpServer, http: PisteHttpClient) {
@@ -47,7 +48,7 @@ export function registerSuggest(server: McpServer, http: PisteHttpClient) {
         lines.push(`### ${supply}`);
         for (const [id, value] of entries.slice(0, 5)) {
           const label = value.label ?? "(sans titre)";
-          const meta = [value.nature, value.dateVersion?.slice(0, 10)].filter(Boolean).join(" · ");
+          const meta = [value.nature, normalizeLegiDate(value.dateVersion)].filter(Boolean).join(" · ");
           lines.push(`- **${label}** ${meta ? `_(${meta})_` : ""}`);
           lines.push(`  \`${id}\``);
           totalShown += 1;

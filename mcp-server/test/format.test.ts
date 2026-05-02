@@ -59,4 +59,26 @@ describe("format — Article mapper", () => {
     const parsed = GetArticleResponseSchema.parse({ article: null });
     expect(parsed.article).toBeNull();
   });
+
+  it("fixture RÉELLE article 1240 Code civil (capture PISTE prod)", () => {
+    const raw = loadFixture("article-1240-code-civil-byNum");
+    const parsed = GetArticleResponseSchema.parse(raw);
+    const summary = summarizeArticle(parsed.article!);
+    expect(summary.numero).toBe("1240");
+    expect(summary.etat).toBe("VIGUEUR");
+    expect(summary.dateDebut).toBe("2016-10-01");
+    expect(summary.texte).toContain("Tout fait quelconque de l'homme");
+    expect(summary.lienLegifrance).toMatch(/LEGIARTI\d+/);
+  });
+
+  it("fixture RÉELLE article 222-33 ancien Code pénal (dates en epoch ms)", () => {
+    const raw = loadFixture("article-1240-code-civil-real");
+    const parsed = GetArticleResponseSchema.parse(raw);
+    const summary = summarizeArticle(parsed.article!);
+    expect(summary.numero).toBe("222-33");
+    expect(summary.etat).toBe("MODIFIE");
+    // dateDebut épochs ms = 898128000000 → 1998-06-18
+    expect(summary.dateDebut).toBe("1998-06-18");
+    expect(summary.dateFin).toBe("2002-01-01");
+  });
 });

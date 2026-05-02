@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
 import { ConsultJuriResponseSchema } from "../schemas.js";
+import { normalizeLegiDate } from "../format.js";
 import { log } from "../logger.js";
 
 function htmlToText(html: string): string {
@@ -53,7 +54,8 @@ export function registerGetJurisprudence(server: McpServer, http: PisteHttpClien
       const meta: string[] = [];
       if (t.juridiction) meta.push(t.juridiction);
       if (t.formation) meta.push(t.formation);
-      if (t.dateTexte) meta.push(t.dateTexte.slice(0, 10));
+      const dateTexte = normalizeLegiDate(t.dateTexte);
+      if (dateTexte) meta.push(dateTexte);
       if (t.numero) meta.push(`n° ${t.numero}`);
       if (t.solution) meta.push(t.solution);
       if (meta.length) lines.push(`_${meta.join(" · ")}_\n`);

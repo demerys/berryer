@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
 import { ConsultTextResponseSchema } from "../schemas.js";
+import { normalizeLegiDate } from "../format.js";
 import { log } from "../logger.js";
 
 export function registerGetLoda(server: McpServer, http: PisteHttpClient) {
@@ -41,8 +42,12 @@ export function registerGetLoda(server: McpServer, http: PisteHttpClient) {
       const meta: string[] = [];
       if (d.nature) meta.push(d.nature);
       if (d.etat) meta.push(d.etat);
-      if (d.dateDebut) meta.push(`En vigueur depuis ${d.dateDebut.slice(0, 10)}`);
-      if (d.dateFin && d.dateFin !== "2999-01-01") meta.push(`Fin : ${d.dateFin.slice(0, 10)}`);
+      const dateDebut = normalizeLegiDate(d.dateDebut);
+      const dateFin = normalizeLegiDate(d.dateFin);
+      if (dateDebut) meta.push(`En vigueur depuis ${dateDebut}`);
+      if (dateFin && dateFin !== "2999-01-01" && !dateFin.startsWith("3000-")) {
+        meta.push(`Fin : ${dateFin}`);
+      }
       if (d.nor) meta.push(`NOR : ${d.nor}`);
       if (d.eli) meta.push(`ELI : ${d.eli}`);
       if (meta.length) lines.push(`_${meta.join(" · ")}_\n`);

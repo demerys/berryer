@@ -233,6 +233,26 @@ export const ConsultJorfResponseSchema = z
 
 export type ConsultJorfResponse = z.infer<typeof ConsultJorfResponseSchema>;
 
+/**
+ * Sommaire d'arrêt — arrive en pratique comme un tableau d'objets
+ * `{id, abstrats, resumePrincipal, autreResume}`. Le Swagger DILA annonce
+ * `string` mais l'API retourne `array`. On accepte aussi `string` au cas où
+ * d'anciens textes auraient l'autre format.
+ */
+export const SommaireItemSchema = z
+  .object({
+    id: z.string().nullable().optional(),
+    abstrats: z.string().nullable().optional(),
+    resumePrincipal: z.string().nullable().optional(),
+    autreResume: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+export const SommaireSchema = z
+  .union([z.string(), z.array(SommaireItemSchema)])
+  .nullable()
+  .optional();
+
 /** Sous-schéma /consult/juri (texte d'une décision judiciaire). */
 const TexteSimpleSchema = z
   .object({
@@ -250,8 +270,12 @@ const TexteSimpleSchema = z
     juridiction: z.string().nullable().optional(),
     formation: z.string().nullable().optional(),
     numero: z.string().nullable().optional(),
+    /** numeroAffaire arrive en pratique comme `["23-23.501"]` (array de string). */
+    numeroAffaire: z.union([z.string(), z.array(z.string())]).nullable().optional(),
     solution: z.string().nullable().optional(),
-    sommaire: z.string().nullable().optional(),
+    sommaire: SommaireSchema,
+    ecli: z.string().nullable().optional(),
+    publicationRecueil: z.string().nullable().optional(),
   })
   .passthrough();
 
@@ -324,12 +348,23 @@ export const SuggestValueSchema = z
   })
   .passthrough();
 
+/**
+ * SuggestResponse.results — le Swagger DILA annonce
+ * `additionalProperties: { additionalProperties: SuggestValue }` (Map of Map)
+ * mais l'API retourne en pratique un simple `Array<SuggestValue>`. On accepte
+ * les deux formes.
+ */
 export const SuggestResponseSchema = z
   .object({
     totalResultNumber: z.number().optional(),
     executionTime: z.number().optional(),
-    /** results: { [supply]: { [id]: SuggestValue } } — Map of Map. */
-    results: z.record(z.string(), z.record(z.string(), SuggestValueSchema)).optional(),
+    results: z
+      .union([
+        z.array(SuggestValueSchema),
+        z.record(z.string(), z.record(z.string(), SuggestValueSchema)),
+      ])
+      .nullable()
+      .optional(),
   })
   .passthrough();
 

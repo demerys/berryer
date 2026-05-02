@@ -37,26 +37,45 @@ export function registerSuggest(server: McpServer, http: PisteHttpClient) {
       }
       const data = parsed.data;
       const lines: string[] = [];
-      lines.push(`**${data.totalResultNumber ?? 0} suggestion(s)** pour "${args.query}" :`);
-      lines.push("");
+      const results = data.results ?? [];
 
-      const groups = data.results ?? {};
-      let totalShown = 0;
-      for (const [supply, items] of Object.entries(groups)) {
-        const entries = Object.entries(items);
-        if (entries.length === 0) continue;
-        lines.push(`### ${supply}`);
-        for (const [id, value] of entries.slice(0, 5)) {
-          const label = value.label ?? "(sans titre)";
-          const meta = [value.nature, normalizeLegiDate(value.dateVersion)].filter(Boolean).join(" · ");
-          lines.push(`- **${label}** ${meta ? `_(${meta})_` : ""}`);
-          lines.push(`  \`${id}\``);
-          totalShown += 1;
-        }
+      // Cas A : array plat de SuggestValue (ce que l'API retourne en pratique)
+      if (Array.isArray(results)) {
+        lines.push(`**${results.length} suggestion(s)** pour "${args.query}" :`);
         lines.push("");
-      }
-      if (totalShown === 0) {
-        lines.push("_(aucune suggestion)_");
+        if (results.length === 0) {
+          lines.push("_(aucune suggestion)_");
+        } else {
+          for (const value of results.slice(0, 15)) {
+            const label = value.label ?? "(sans titre)";
+            const meta = [value.nature, value.origin, normalizeLegiDate(value.dateVersion)]
+              .filter(Boolean)
+              .join(" · ");
+            lines.push(`- **${label}** ${meta ? `_(${meta})_` : ""}`);
+            if (value.id) lines.push(`  \`${value.id}\``);
+          }
+        }
+      } else {
+        // Cas B : Map<supply, Map<id, SuggestValue>> (annoncé par le Swagger)
+        lines.push(`**${data.totalResultNumber ?? 0} suggestion(s)** pour "${args.query}" :`);
+        lines.push("");
+        let totalShown = 0;
+        for (const [supply, items] of Object.entries(results as Record<string, Record<string, { id?: string | null; label?: string | null; nature?: string | null; dateVersion?: number | string | null }>>)) {
+          const entries = Object.entries(items);
+          if (entries.length === 0) continue;
+          lines.push(`### ${supply}`);
+          for (const [id, value] of entries.slice(0, 5)) {
+            const label = value.label ?? "(sans titre)";
+            const meta = [value.nature, normalizeLegiDate(value.dateVersion)].filter(Boolean).join(" · ");
+            lines.push(`- **${label}** ${meta ? `_(${meta})_` : ""}`);
+            lines.push(`  \`${id}\``);
+            totalShown += 1;
+          }
+          lines.push("");
+        }
+        if (totalShown === 0) {
+          lines.push("_(aucune suggestion)_");
+        }
       }
       return { content: [{ type: "text", text: lines.join("\n") }] };
     },

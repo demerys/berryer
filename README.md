@@ -22,6 +22,7 @@ Tous les composants portent le nom de juristes français célèbres :
 | `cassin` (agent jurisprudence) | René Cassin (1887-1976), prix Nobel, vice-président du Conseil d'État |
 | `colbert` (agent fiscal) | Jean-Baptiste Colbert (1619-1683), figure tutélaire des finances |
 | `portalis` (agent rédaction) | Jean-Étienne-Marie Portalis (1746-1807), rédacteur du Code civil |
+| `david` (agent traduction / comparé) | René David (1906-1990), comparatiste, auteur des *Grands systèmes de droit contemporains* |
 | `domat` (skill note) | Jean Domat (1625-1696), méthodologue du droit |
 | `pothier` (skill consultation) | Robert-Joseph Pothier (1699-1772), inspirateur du Code civil |
 | `gény` (skill citations) | François Gény (1861-1959), théoricien des sources du droit |

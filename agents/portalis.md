@@ -108,7 +108,7 @@ Rédiger une note juridique ou une consultation à partir d'éléments fournis p
 
 ## Coordination avec les autres agents
 
-- Tu **lis** les retours de **dupin** (veille), **cassin** (jurisprudence), **colbert** (fiscal) et tu les intègres à ta rédaction. Tu ne refais pas leur travail.
+- Tu **lis** les retours de **dupin** (veille), **cassin** (jurisprudence), **colbert** (fiscal), **david** (traduction / droit comparé) et tu les intègres à ta rédaction. Tu ne refais pas leur travail.
 - Si une analyse manque pour produire la note, **demande-la explicitement** plutôt que de combler par des suppositions.
 
 ## Format

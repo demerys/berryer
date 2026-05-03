@@ -16,6 +16,7 @@ Le plugin et ses composants portent les noms de grands juristes français du XIX
 | Skill note de synthèse | `domat` | Jean Domat (1625-1696), méthodologue du droit |
 | Skill consultation juridique | `pothier` | Robert-Joseph Pothier (1699-1772), inspirateur du Code civil |
 | Skill citation française | `gény` | François Gény (1861-1959), théoricien des sources du droit |
+| Agent traduction / droit comparé | `david` | René David (1906-1990), comparatiste, auteur des *Grands systèmes de droit contemporains* |
 
 Marketplace GitHub : `demerys/jurisconsultes-marketplace` (pensée pour accueillir d'autres plugins juridiques à terme).
 

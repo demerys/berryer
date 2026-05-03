@@ -172,22 +172,27 @@ export type SearchResult = z.infer<typeof SearchResultSchema>;
 
 const ConsultArticleStub = z
   .object({
-    id: z.string().optional(),
-    cid: z.string().optional(),
-    num: z.string().optional(),
-    intOrdre: z.number().optional(),
+    id: z.string().nullable().optional(),
+    cid: z.string().nullable().optional(),
+    num: z.string().nullable().optional(),
+    intOrdre: z.number().nullable().optional(),
   })
   .passthrough();
 
-const ConsultSectionStub: z.ZodType<{ id?: string; title?: string }> = z.lazy(() =>
+type ConsultSectionStubT = {
+  id?: string | null;
+  cid?: string | null;
+  title?: string | null;
+};
+const ConsultSectionStub: z.ZodType<ConsultSectionStubT> = z.lazy(() =>
   z
     .object({
-      id: z.string().optional(),
-      cid: z.string().optional(),
-      title: z.string().optional(),
-      etat: z.string().optional(),
-      articles: z.array(ConsultArticleStub).optional(),
-      sections: z.array(ConsultSectionStub).optional(),
+      id: z.string().nullable().optional(),
+      cid: z.string().nullable().optional(),
+      title: z.string().nullable().optional(),
+      etat: z.string().nullable().optional(),
+      articles: z.array(ConsultArticleStub).nullable().optional(),
+      sections: z.array(ConsultSectionStub).nullable().optional(),
     })
     .passthrough(),
 );

@@ -48,15 +48,27 @@ export function registerGetLoda(server: McpServer, http: PisteHttpClient) {
       if (dateFin && dateFin !== "2999-01-01" && !dateFin.startsWith("3000-")) {
         meta.push(`Fin : ${dateFin}`);
       }
-      if (d.nor) meta.push(`NOR : ${d.nor}`);
-      if (d.eli) meta.push(`ELI : ${d.eli}`);
       if (meta.length) lines.push(`_${meta.join(" · ")}_\n`);
-      if (d.resume) lines.push(d.resume + "\n");
+
+      // Mentions identifiantes sur des lignes dédiées (visibles, copiables tel
+      // quel par les agents — notamment Dupin pour la veille).
+      const idLines: string[] = [];
+      if (d.nor) idLines.push(`**NOR** : \`${d.nor}\``);
+      if (d.eli) idLines.push(`**ELI** : \`${d.eli}\``);
+      idLines.push(`**LEGITEXT** : \`${args.textId}\``);
+      idLines.push(`**Lien Légifrance** : https://www.legifrance.gouv.fr/loda/id/${args.textId}/`);
+      lines.push(idLines.join("  \n"));
+      lines.push("");
+
+      if (d.resume) {
+        lines.push("**Résumé**");
+        lines.push(d.resume);
+        lines.push("");
+      }
 
       const articleCount = (d.articles ?? []).length;
       const sectionCount = (d.sections ?? []).length;
       lines.push(`Structure : ${sectionCount} section(s), ${articleCount} article(s) racine.`);
-      lines.push(`\nIdentifiant : \`${args.textId}\` · [Légifrance](https://www.legifrance.gouv.fr/loda/id/${args.textId}/)`);
 
       return { content: [{ type: "text", text: lines.join("\n") }] };
     },

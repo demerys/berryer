@@ -34,15 +34,26 @@ export function registerGetJorf(server: McpServer, http: PisteHttpClient) {
       const dateTexte = normalizeLegiDate(d.dateTexte);
       if (dateTexte) meta.push(dateTexte);
       if (d.textNumber) meta.push(`Texte n° ${d.textNumber}`);
-      if (d.nor) meta.push(`NOR : ${d.nor}`);
       if (meta.length) lines.push(`_${meta.join(" · ")}_\n`);
-      if (d.resume) lines.push(d.resume + "\n");
+
+      // Mentions identifiantes sur lignes dédiées (copiables par les agents).
+      const idLines: string[] = [];
+      if (d.nor) idLines.push(`**NOR** : \`${d.nor}\``);
+      idLines.push(`**JORFTEXT** : \`${args.textCid}\``);
+      idLines.push(`**Lien Légifrance** : https://www.legifrance.gouv.fr/jorf/id/${args.textCid}`);
+      lines.push(idLines.join("  \n"));
+      lines.push("");
+
+      if (d.resume) {
+        lines.push("**Résumé**");
+        lines.push(d.resume);
+        lines.push("");
+      }
       if (d.notice) lines.push("## Notice\n" + d.notice + "\n");
 
       const articleCount = (d.articles ?? []).length;
       const sectionCount = (d.sections ?? []).length;
       lines.push(`Structure : ${sectionCount} section(s), ${articleCount} article(s) racine.`);
-      lines.push(`\nIdentifiant : \`${args.textCid}\` · [Légifrance](https://www.legifrance.gouv.fr/jorf/id/${args.textCid})`);
 
       return { content: [{ type: "text", text: lines.join("\n") }] };
     },

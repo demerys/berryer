@@ -14,14 +14,22 @@ interface SectionLite {
 }
 
 function summarizeSections(
-  sections: ReadonlyArray<{ id?: string; title?: string; articles?: unknown[]; sections?: unknown[] }> | undefined,
+  sections:
+    | ReadonlyArray<{
+        id?: string | null;
+        title?: string | null;
+        articles?: unknown[] | null;
+        sections?: unknown[] | null;
+      }>
+    | null
+    | undefined,
   depth = 0,
   maxDepth = 2,
 ): SectionLite[] {
   if (!sections || depth >= maxDepth) return [];
   return sections.map((s) => ({
-    id: s.id,
-    title: s.title,
+    id: s.id ?? undefined,
+    title: s.title ?? undefined,
     articles: Array.isArray(s.articles) ? s.articles.length : 0,
     sections: summarizeSections(s.sections as never, depth + 1, maxDepth),
   }));

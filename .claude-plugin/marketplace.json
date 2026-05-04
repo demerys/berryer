@@ -1,0 +1,19 @@
+{
+  "name": "berryer-suite",
+  "owner": {
+    "name": "Demerys",
+    "email": "contact@demerys.com",
+    "url": "https://demerys.com"
+  },
+  "metadata": {
+    "description": "Suite de plugins juridiques français pour avocats, juristes et experts-comptables. Accès Légifrance et BOFiP via PISTE, agents juridiques nommés selon les figures du droit français.",
+    "version": "0.2.0"
+  },
+  "plugins": [
+    {
+      "name": "berryer",
+      "source": "./plugins/berryer",
+      "description": "Cabinet juridique virtuel généraliste : 5 agents (Dupin/veille, Cassin/jurisprudence, Colbert/fiscal, Portalis/rédaction, David/traduction) + 3 skills méthodologiques (Domat/note, Pothier/consultation, Gény/citations). Pour cabinets pluri-disciplinaires."
+    }
+  ]
+}

@@ -1,20 +1,23 @@
 {
-  "name": "@demerys/berryer-mcp-server",
+  "name": "@berryer/core",
   "version": "0.1.0",
-  "description": "MCP server pour le plugin berryer — expose les API Légifrance et BOFiP via PISTE.",
+  "description": "Core library partagé par les plugins de la suite Berryer (client PISTE OAuth, cache SQLite, schémas Zod, tools Légifrance).",
   "type": "module",
   "private": true,
   "engines": {
     "node": ">=20"
   },
-  "main": "dist/index.js",
-  "bin": {
-    "berryer-mcp": "dist/index.js"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc -p .",
     "dev": "tsc -p . --watch",
-    "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p . --noEmit"

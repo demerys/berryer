@@ -1,0 +1,18 @@
+{
+  "name": "berryer-suite",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Monorepo de la suite de plugins Claude Berryer (Demerys) — accès Légifrance/BOFiP via PISTE + équipes d'agents juridiques spécialisés.",
+  "workspaces": [
+    "packages/*",
+    "plugins/*/mcp-server"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

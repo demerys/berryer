@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 
-const SERVER = resolve(__dirname, "../dist/index.js");
+// Le smoke test spawne le serveur MCP du plugin berryer (qui importe @berryer/core).
+// Le dist du plugin doit avoir été buildé avant : `npm run build` à la racine du monorepo.
+const SERVER = resolve(__dirname, "../../../plugins/berryer/mcp-server/dist/index.js");
 
 interface JsonRpcResponse {
   jsonrpc: "2.0";

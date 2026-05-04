@@ -2,15 +2,30 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## État du repo
+## État du repo (mai 2026)
 
-Pre-implementation : seul `SPEC_berryer_plugin.md` existe. Toute la structure code/config décrite ci-dessous est à créer. **Le spec est la source de vérité** — le lire en entier avant toute décision d'architecture, et notamment la section 14 ("Instructions à Claude Code pour démarrer") qui dicte le workflow de bootstrap (questions → plan 15 étapes → commits par étape).
+**Monorepo de la suite Berryer**, contient à terme 3 plugins (généraliste, droit des affaires, droit du travail) qui partagent un `core` commun.
+
+```
+demerys/berryer/
+├── packages/core/                # @berryer/core (lib partagée)
+├── plugins/
+│   ├── berryer/                  # plugin généraliste (Dupin, Cassin, Colbert, Portalis, David)
+│   ├── berryer-affaires/         # à venir M3-M4 (Thaller, Ripert, Houin, Guyon)
+│   └── berryer-social/           # à venir M5-M6 (Durand, Lyon-Caen, Despax, Camerlynck)
+├── .claude-plugin/marketplace.json   # à créer M2
+├── package.json                  # workspaces npm
+├── tsconfig.base.json
+└── docs/, scripts/ (dev tools), SPEC_berryer_plugin.md (archive V1)
+```
+
+`SPEC_berryer_plugin.md` reste la source de vérité historique pour la V1. Pour la refonte en cours (V0.2.0), voir `~/.claude/plans/ok-regarde-aussi-je-jazzy-diffie.md` (plan validé en mai 2026).
 
 ## Identité produit
 
-`berryer` est un plugin Claude (compatible Claude Code, Cowork, et Desktop) qui expose les API **Légifrance** et **BOFiP** via **PISTE** à des avocats / juristes / experts-comptables. L'utilisateur final fournit **sa propre clé PISTE** — Demerys ne centralise rien (argument RGPD/secret professionnel).
+La suite Berryer est éditée par Demerys pour avocats / juristes / experts-comptables. Chaque plugin expose les API **Légifrance** et **BOFiP** via **PISTE** avec une équipe d'agents juridiques nommés selon des juristes français célèbres. L'utilisateur final fournit **sa propre clé PISTE** — Demerys ne centralise rien (argument RGPD/secret professionnel).
 
-Naming : tous les composants portent le nom de juristes français (Berryer, Dupin, Cassin, Colbert, Portalis, Domat, Pothier, Gény). Cohérence de marque non négociable, voir spec §1.
+Naming : tous les composants portent le nom de juristes français. Cohérence de marque non négociable. Voir le SPEC pour la liste complète et les biographies courtes.
 
 ## Stack — IMPORTANT : ne PAS suivre le CLAUDE.md global Go
 
@@ -19,15 +34,28 @@ Le CLAUDE.md utilisateur global décrit une stack Go/Gin/SQLite. **Il ne s'appli
 - MCP server : TypeScript + `@modelcontextprotocol/sdk` (transport stdio)
 - Runtime : Node.js ≥ 20
 - HTTP : `undici`
-- Cache local : `better-sqlite3` (un seul fichier `cache.db`)
+- Cache local : `better-sqlite3` (un fichier `cache.db` par plugin)
 - Validation : `zod`
 - Tests : `vitest`
+- Workspaces : npm 10+ workspaces (les 3 plugins + le core)
 
-## Architecture critique du plugin
+## Architecture critique
 
-Règle stricte vérifiée doc Anthropic — **un seul fichier dans `.claude-plugin/`** : `plugin.json`. Tous les autres dossiers (`agents/`, `skills/`, `commands/`, `hooks/`, `mcp-server/`) sont à la **racine** du plugin, ainsi que `.mcp.json`. Voir §2.1 du spec pour l'arborescence complète.
+### Monorepo + plugins indépendants
 
-Distribution via le repo marketplace `demerys/jurisconsultes-marketplace` (à créer séparément) qui contient le plugin `berryer/` + un `.claude-plugin/marketplace.json`. Même repo consommé par Cowork (UI) et Claude Code (CLI).
+- `packages/core/` exporte `createBerryerServer({ name, version })` qui fait tout le wiring : config, OAuth PISTE, cache SQLite, registre des 10 tools Légifrance, signal handlers. Sans changement fonctionnel par rapport à V1.
+- Chaque `plugins/<nom>/mcp-server/src/index.ts` fait juste `import { createBerryerServer, log } from "@berryer/core"` puis `const { start } = createBerryerServer({ name, version }); start().catch(...)`. ~10 lignes par plugin.
+- Build : `npm run build` à la racine builde `core` puis tous les plugins (workspaces). Au runtime, `node plugins/<nom>/mcp-server/dist/index.js` résout `@berryer/core` via les symlinks workspace dans `node_modules/`.
+
+### Règle stricte des dossiers d'un plugin
+
+Vérifié doc Anthropic — **un seul fichier dans `.claude-plugin/` du plugin** : `plugin.json`. Tous les autres dossiers (`agents/`, `skills/`, `commands/`, `hooks/`, `mcp-server/`) sont à la **racine du plugin** (i.e. dans `plugins/<nom>/`), ainsi que `.mcp.json`.
+
+Le `marketplace.json` global est à la racine **du monorepo** (`./.claude-plugin/marketplace.json`), pas dans un plugin.
+
+### Distribution
+
+Repo `demerys/berryer` (privé en beta, public à terme) contient le monorepo entier + le `marketplace.json` qui liste les 3 plugins. Un utilisateur fait `/plugin marketplace add demerys/berryer` puis `/plugin install berryer` (ou `berryer-affaires` ou `berryer-social`). Plus besoin d'un repo marketplace séparé.
 
 ## PISTE / OAuth
 

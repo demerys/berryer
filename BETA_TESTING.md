@@ -29,40 +29,57 @@ Vous testez **avant tout le monde** un cabinet juridique virtuel français branc
 
 ## Installation
 
-Selon votre profil et votre outil principal, choisissez le parcours :
+Selon votre profil et votre outil principal, choisissez le parcours.
+
+### Étape commune préalable : configurer vos credentials PISTE
+
+Le plugin a besoin de votre **Client ID** et **Client Secret** PISTE. Le moyen le plus simple, valable pour tous les parcours :
+
+```bash
+bash scripts/setup-credentials.sh
+```
+
+Ce script interactif vous demande vos credentials, les enregistre dans `~/.config/berryer/credentials.json` (mode 600 — lecture/écriture pour vous uniquement), et fait un test de connexion immédiat. **Aucune donnée n'est envoyée sur Internet hors de l'appel test à PISTE.**
+
+Avantage : ça marche dans **tous les contextes** — Cowork lancé en GUI sur macOS, Claude Code en terminal, Claude Desktop. Vous configurez une fois, vous oubliez.
+
+> Si vous préférez utiliser des variables d'environnement (`PISTE_CLIENT_ID` / `PISTE_CLIENT_SECRET` dans votre shell), c'est aussi supporté. Le plugin lit en priorité l'environnement, et fait fallback sur le fichier.
 
 ### Parcours 1 — Cowork (recommandé pour les avocats sans terminal)
 
 **Pré-requis** : abonnement Claude Pro/Max/Team/Enterprise + Claude Desktop installé + compte PISTE avec souscription API Légifrance.
 
-1. Ouvrez **Claude Desktop** → onglet **Cowork** → **Customize**
-2. Bouton **+** → **Upload plugin**
-3. Sélectionnez le dossier décompressé (ou directement le zip `berryer-vX.Y.Z.zip` qui vous a été transmis)
-4. Cliquez **Install** sur le plugin Berryer dans la liste
-5. Cowork vous demande vos credentials PISTE. Saisissez :
-   - `PISTE_CLIENT_ID` : votre Client ID
-   - `PISTE_CLIENT_SECRET` : votre Client Secret
-6. Premier test : tapez `/berryer:recherche article 1240 code civil` dans une conversation Cowork
+1. Décompressez le zip que vous avez reçu (ex: `~/berryer`).
+2. Ouvrez un terminal dans ce dossier (Finder → clic droit sur le dossier → « Nouveau terminal au dossier » sur macOS) et lancez :
+   ```bash
+   bash scripts/setup-credentials.sh
+   ```
+   Saisissez votre Client ID et Client Secret PISTE quand le script vous le demande.
+3. Ouvrez **Claude Desktop** → onglet **Cowork** → **Customize**.
+4. Bouton **+** → **Upload plugin** → sélectionnez le dossier `berryer` décompressé.
+5. Cliquez **Install** sur le plugin Berryer dans la liste.
+6. Premier test : tapez `piste_status` dans une conversation Cowork. Vous devez voir `"diagnostic": "✅ Plugin opérationnel"`.
+7. Deuxième test : tapez `/berryer:recherche article 1240 code civil`.
 
-Si l'install ne se fait pas, voir [Troubleshooting](#troubleshooting) ci-dessous.
+Si le plugin ne charge pas ou si `piste_status` retourne une erreur, voir [Troubleshooting](#troubleshooting).
 
 ### Parcours 2 — Claude Code (pour les profils techniques ou DSI cabinet)
 
 **Pré-requis** : Claude Code installé + Node.js ≥ 20 + compte PISTE.
 
-1. Décompressez le zip où vous voulez (ex: `~/berryer`)
-2. Ajoutez vos credentials dans votre shell :
+1. Décompressez le zip où vous voulez (ex: `~/berryer`).
+2. Lancez le script de configuration :
    ```bash
-   export PISTE_CLIENT_ID="votre_client_id"
-   export PISTE_CLIENT_SECRET="votre_client_secret"
+   cd ~/berryer && bash scripts/setup-credentials.sh
    ```
-   (Idéalement persistant dans `~/.zshrc` ou `~/.bashrc`, puis `source` du fichier.)
 3. Lancez Claude Code en pointant sur le plugin :
    ```bash
    claude --plugin-dir ~/berryer
    ```
-4. Dans Claude Code, vérifiez : `/plugin` doit lister `berryer` sans erreur
-5. Premier test : tapez `piste_status` puis `/berryer:recherche article 1240 code civil`
+4. Dans Claude Code, vérifiez : `piste_status` doit retourner `"diagnostic": "✅ Plugin opérationnel"`.
+5. Premier test fonctionnel : `/berryer:recherche article 1240 code civil`.
+
+> **Alternative env vars** : si vous préférez ne pas utiliser le fichier de credentials, vous pouvez exporter `PISTE_CLIENT_ID` et `PISTE_CLIENT_SECRET` dans votre `~/.zshrc` (ou `~/.bashrc`), puis `source ~/.zshrc` avant de lancer Claude Code. Le plugin lit l'env en priorité.
 
 ### Parcours 3 — Accès au repo GitHub privé (cabinets avec dev/IT)
 
@@ -71,10 +88,11 @@ Si vous avez reçu une invitation GitHub sur le repo `demerys/berryer` :
 ```bash
 git clone https://github.com/demerys/berryer
 cd berryer/mcp-server && npm install && npm run build
-cd .. && claude --plugin-dir .
+cd .. && bash scripts/setup-credentials.sh
+claude --plugin-dir .
 ```
 
-Pour mettre à jour à chaque release : `git pull` à la racine + `cd mcp-server && npm run build`.
+Pour mettre à jour à chaque release : `git pull` à la racine + `cd mcp-server && npm run build` + redémarrer Claude.
 
 ---
 
@@ -186,7 +204,19 @@ Si vous décidez de ne pas continuer le programme beta, votre version locale du 
 
 ### Mon Claude Code dit « le plugin n'a pas accès aux outils MCP »
 
-→ Vérifiez que le serveur MCP est bien construit (`mcp-server/dist/index.js` existe), et que vos env vars `PISTE_CLIENT_ID` / `PISTE_CLIENT_SECRET` sont bien chargées dans le shell d'où vous lancez Claude Code (`echo $PISTE_CLIENT_ID` doit afficher votre ID).
+→ Vérifiez que le serveur MCP est bien construit (`mcp-server/dist/index.js` existe), et qu'au moins une des deux sources de credentials est configurée :
+- Soit le fichier `~/.config/berryer/credentials.json` existe (lancez `bash scripts/setup-credentials.sh` si non)
+- Soit les env vars `PISTE_CLIENT_ID` / `PISTE_CLIENT_SECRET` sont chargées dans le shell
+
+Tapez `piste_status` dans Claude Code, le champ `credentialsSource` doit valoir `"env"` ou `"file"` (jamais `"none"`).
+
+### Cowork a installé le plugin mais `piste_status` dit `credentialsSource: "none"`
+
+→ Vous n'avez pas (encore) lancé `setup-credentials.sh`. Ouvrez un terminal, allez dans le dossier du plugin (celui que vous avez uploadé dans Cowork), et lancez :
+```bash
+bash scripts/setup-credentials.sh
+```
+Puis quittez Cowork complètement (Cmd+Q) et relancez. Cowork va relire le fichier de credentials au prochain démarrage du serveur MCP.
 
 ---
 

@@ -44,14 +44,28 @@ Sur la page de votre application :
 
 1. Dans le catalogue de marketplaces, cliquez sur **berryer**.
 2. **Install**.
-3. Cowork vous demande vos credentials PISTE :
-   - `PISTE_CLIENT_ID` : collez votre Client ID
-   - `PISTE_CLIENT_SECRET` : collez votre Client Secret
-4. Validez. Les credentials sont stockés dans le **Keychain macOS** (ou **Credential Manager** Windows) — Demerys et Anthropic n'y ont pas accès.
 
-### 5. Premier test
+### 5. Configurer les credentials PISTE
+
+Le plugin a besoin de votre Client ID et Client Secret PISTE pour interroger Légifrance et le BOFiP en votre nom. Méthode recommandée — un script interactif :
+
+1. Localisez le dossier d'installation du plugin (Cowork le télécharge automatiquement, le chemin est visible dans Customize → berryer → emplacement local).
+2. Ouvrez un terminal dans ce dossier (Finder → clic droit → « Nouveau terminal au dossier » sur macOS) et lancez :
+   ```bash
+   bash scripts/setup-credentials.sh
+   ```
+3. Le script vous demande vos credentials, les enregistre dans `~/.config/berryer/credentials.json` (lecture restreinte à votre utilisateur), et fait un test de connexion immédiat.
+4. Quittez Claude Desktop complètement (Cmd+Q sur macOS) et relancez. Le plugin lira votre fichier au prochain démarrage.
+
+**Aucune donnée n'est envoyée nulle part** lors de cette configuration — le seul appel sortant est un test OAuth direct vers `oauth.piste.gouv.fr` pour vérifier que vos credentials sont valides.
+
+### 6. Premier test
 
 Dans une conversation Cowork, tapez :
+
+> `piste_status`
+
+Vous devez voir `"diagnostic": "✅ Plugin opérationnel"`. Puis :
 
 > `/berryer:recherche article 1240 code civil`
 
@@ -77,7 +91,15 @@ Pour les utilisateurs à l'aise avec un terminal. Compter ~5 minutes.
 
 ### 1. Configurer les credentials PISTE
 
-Ajoutez dans votre `~/.zshrc` (ou `~/.bashrc`) :
+Au choix, l'une des deux voies :
+
+**Voie A — Script interactif (recommandée, marche partout)** :
+```bash
+cd ~/berryer && bash scripts/setup-credentials.sh
+```
+Crée `~/.config/berryer/credentials.json` (mode 600, lecture restreinte). Le plugin lit ce fichier en fallback si l'environnement shell ne contient pas les credentials.
+
+**Voie B — Variables d'environnement** : ajoutez dans votre `~/.zshrc` (ou `~/.bashrc`) :
 
 ```bash
 export PISTE_CLIENT_ID="votre_client_id"

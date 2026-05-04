@@ -30,6 +30,7 @@ export function registerStatus(
         hasClientId: Boolean(config.clientId),
         hasClientSecret: Boolean(config.clientSecret),
         clientIdPrefix: config.clientId ? config.clientId.slice(0, 8) + "…" : null,
+        credentialsSource: config.credentialsSource,
         cache: cache ? cache.stats() : null,
       };
 

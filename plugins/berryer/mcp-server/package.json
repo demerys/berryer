@@ -9,7 +9,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p .",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/index.js --banner:js=\"import { createRequire } from \\\"module\\\"; const require = createRequire(import.meta.url);\"",
     "dev": "tsc -p . --watch",
     "typecheck": "tsc -p . --noEmit"
   },

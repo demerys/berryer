@@ -1,8 +1,12 @@
 import { createHash } from "node:crypto";
-import { mkdirSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname } from "node:path";
-import Database from "better-sqlite3";
-import type { Database as DatabaseType } from "better-sqlite3";
 import { log } from "./logger.js";
 
 export interface CacheStats {
@@ -16,33 +20,46 @@ export interface CacheOptions {
   path: string;
 }
 
+interface CacheEntry {
+  response: unknown;
+  fetchedAt: number;
+  ttl: number;
+}
+
+interface CacheFile {
+  /** key = `${method}|${paramsHash}` */
+  entries: Record<string, CacheEntry>;
+}
+
 /**
- * Cache SQLite local pour les réponses PISTE.
- * Schéma : (method, params_hash) → response_json + fetched_at + ttl.
- * better-sqlite3 est synchrone et 100% local — zéro latence après ouverture.
+ * Cache local pour les réponses PISTE — implémentation **JSON pur**.
+ *
+ * Pas de dépendance native (pas de better-sqlite3) — le plugin reste
+ * 100 % bundlable par esbuild et fonctionne après un simple `git clone`
+ * sans étape de build native. Pour les volumes de cache typiques d'un
+ * cabinet (10-1000 entrées par session), la perf est largement
+ * suffisante : la lecture/écriture d'un objet JSON ~10-200 KB prend
+ * moins d'une milliseconde.
+ *
+ * - Stockage : un seul fichier JSON, écriture atomique via temp + rename.
+ * - Mémoire : Map en mémoire pour les hits, persisté à chaque set/clear.
+ * - Tests : path = ":memory:" → pas d'IO disque.
  */
 export class ResponseCache {
-  private db: DatabaseType;
+  private path: string | undefined;
+  private store: Map<string, CacheEntry>;
   private hits = 0;
   private misses = 0;
 
   constructor(opts: CacheOptions) {
-    if (opts.path !== ":memory:") {
-      mkdirSync(dirname(opts.path), { recursive: true });
+    if (opts.path === ":memory:") {
+      this.path = undefined;
+      this.store = new Map();
+      return;
     }
-    this.db = new Database(opts.path);
-    this.db.pragma("journal_mode = WAL");
-    this.db.pragma("synchronous = NORMAL");
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS responses (
-        method TEXT NOT NULL,
-        params_hash TEXT NOT NULL,
-        response_json TEXT NOT NULL,
-        fetched_at INTEGER NOT NULL,
-        ttl INTEGER NOT NULL,
-        PRIMARY KEY(method, params_hash)
-      )
-    `);
+    this.path = opts.path;
+    mkdirSync(dirname(this.path), { recursive: true });
+    this.store = this.load();
   }
 
   /** Stable hash of arbitrary params. */
@@ -50,57 +67,97 @@ export class ResponseCache {
     return createHash("sha256").update(JSON.stringify(params ?? null)).digest("hex");
   }
 
+  private key(method: string, paramsHash: string): string {
+    return `${method}|${paramsHash}`;
+  }
+
+  private load(): Map<string, CacheEntry> {
+    if (!this.path || !existsSync(this.path)) return new Map();
+    try {
+      const raw = readFileSync(this.path, "utf-8");
+      const parsed = JSON.parse(raw) as CacheFile;
+      const m = new Map<string, CacheEntry>();
+      for (const [k, v] of Object.entries(parsed.entries ?? {})) {
+        m.set(k, v);
+      }
+      return m;
+    } catch (err) {
+      log.warn("cache file unreadable, starting fresh", {
+        path: this.path,
+        err: err instanceof Error ? err.message : String(err),
+      });
+      return new Map();
+    }
+  }
+
+  private persist(): void {
+    if (!this.path) return;
+    const data: CacheFile = { entries: Object.fromEntries(this.store) };
+    const tmp = `${this.path}.tmp.${process.pid}.${Date.now()}`;
+    try {
+      writeFileSync(tmp, JSON.stringify(data));
+      renameSync(tmp, this.path);
+    } catch (err) {
+      log.warn("cache persist failed", {
+        path: this.path,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
   get<T = unknown>(method: string, paramsHash: string): T | undefined {
-    const row = this.db
-      .prepare<[string, string], { response_json: string; fetched_at: number; ttl: number }>(
-        "SELECT response_json, fetched_at, ttl FROM responses WHERE method = ? AND params_hash = ?",
-      )
-      .get(method, paramsHash);
-    if (!row) {
+    const k = this.key(method, paramsHash);
+    const entry = this.store.get(k);
+    if (!entry) {
       this.misses += 1;
       return undefined;
     }
-    if (Date.now() > row.fetched_at + row.ttl) {
+    if (Date.now() > entry.fetchedAt + entry.ttl) {
       this.misses += 1;
-      this.db
-        .prepare("DELETE FROM responses WHERE method = ? AND params_hash = ?")
-        .run(method, paramsHash);
+      this.store.delete(k);
+      this.persist();
       return undefined;
     }
     this.hits += 1;
-    return JSON.parse(row.response_json) as T;
+    return entry.response as T;
   }
 
   set(method: string, paramsHash: string, response: unknown, ttlMs: number): void {
-    this.db
-      .prepare(
-        "INSERT OR REPLACE INTO responses (method, params_hash, response_json, fetched_at, ttl) VALUES (?, ?, ?, ?, ?)",
-      )
-      .run(method, paramsHash, JSON.stringify(response), Date.now(), ttlMs);
+    const k = this.key(method, paramsHash);
+    this.store.set(k, { response, fetchedAt: Date.now(), ttl: ttlMs });
+    this.persist();
   }
 
   /** Clear all rows or those for a given method. */
   clear(method?: string): number {
-    const result = method
-      ? this.db.prepare("DELETE FROM responses WHERE method = ?").run(method)
-      : this.db.prepare("DELETE FROM responses").run();
-    log.info("cache cleared", { method: method ?? "*", deleted: result.changes });
-    return result.changes;
+    let deleted = 0;
+    if (method) {
+      const prefix = `${method}|`;
+      for (const k of this.store.keys()) {
+        if (k.startsWith(prefix)) {
+          this.store.delete(k);
+          deleted += 1;
+        }
+      }
+    } else {
+      deleted = this.store.size;
+      this.store.clear();
+    }
+    this.persist();
+    log.info("cache cleared", { method: method ?? "*", deleted });
+    return deleted;
   }
 
   stats(): CacheStats {
-    const row = this.db
-      .prepare<[], { count: number }>("SELECT COUNT(*) as count FROM responses")
-      .get();
     return {
-      totalRows: row?.count ?? 0,
+      totalRows: this.store.size,
       hits: this.hits,
       misses: this.misses,
     };
   }
 
   close(): void {
-    this.db.close();
+    this.persist();
   }
 }
 

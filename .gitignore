@@ -1,5 +1,8 @@
 node_modules/
 dist/
+# Bundles plugins committed pour install marketplace sans build (esbuild --bundle, self-contained)
+!plugins/*/mcp-server/dist/
+!plugins/*/mcp-server/dist/**
 .cache/
 *.db
 *.db-shm

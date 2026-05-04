@@ -1,0 +1,210 @@
+# Programme beta Berryer — Guide testeur
+
+Bienvenue dans le programme de test privé du plugin Berryer.
+
+Vous testez **avant tout le monde** un cabinet juridique virtuel français branché sur Légifrance et le BOFiP. Vos retours nous serviront à corriger les derniers bugs et à ajuster le comportement des agents avant la mise à disposition publique.
+
+---
+
+## Ce qu'on attend de vous
+
+**Tester en conditions réelles** sur 2-3 dossiers concrets de votre cabinet pendant 2 à 4 semaines :
+- Quelques recherches d'articles ou d'arrêts
+- 1 ou 2 notes de synthèse complètes (Portalis avec Cassin et/ou Colbert en amont)
+- Si pertinent : 1 traduction d'une clause de contrat anglo-saxon (David)
+- Si pertinent : 1 veille thématique (Dupin)
+
+**Ce qu'on cherche à apprendre** :
+- Les agents délèguent-ils correctement quand vous parlez en langage naturel ?
+- Les citations sont-elles toujours exactes (à vérifier sur Légifrance) ?
+- Les notes sont-elles directement utilisables dans votre pratique, ou nécessitent-elles trop de retouche ?
+- Y a-t-il des cas d'usage récurrents non couverts ?
+
+**Ce qu'on ne vous demande PAS** :
+- Tester l'exhaustivité de chaque tool techniquement
+- Documenter formellement vos sessions
+- Nous envoyer le contenu de vos dossiers (par sécurité, restez sur des cas anonymisés)
+
+---
+
+## Installation
+
+Selon votre profil et votre outil principal, choisissez le parcours :
+
+### Parcours 1 — Cowork (recommandé pour les avocats sans terminal)
+
+**Pré-requis** : abonnement Claude Pro/Max/Team/Enterprise + Claude Desktop installé + compte PISTE avec souscription API Légifrance.
+
+1. Ouvrez **Claude Desktop** → onglet **Cowork** → **Customize**
+2. Bouton **+** → **Upload plugin**
+3. Sélectionnez le dossier décompressé (ou directement le zip `berryer-vX.Y.Z.zip` qui vous a été transmis)
+4. Cliquez **Install** sur le plugin Berryer dans la liste
+5. Cowork vous demande vos credentials PISTE. Saisissez :
+   - `PISTE_CLIENT_ID` : votre Client ID
+   - `PISTE_CLIENT_SECRET` : votre Client Secret
+6. Premier test : tapez `/berryer:recherche article 1240 code civil` dans une conversation Cowork
+
+Si l'install ne se fait pas, voir [Troubleshooting](#troubleshooting) ci-dessous.
+
+### Parcours 2 — Claude Code (pour les profils techniques ou DSI cabinet)
+
+**Pré-requis** : Claude Code installé + Node.js ≥ 20 + compte PISTE.
+
+1. Décompressez le zip où vous voulez (ex: `~/berryer`)
+2. Ajoutez vos credentials dans votre shell :
+   ```bash
+   export PISTE_CLIENT_ID="votre_client_id"
+   export PISTE_CLIENT_SECRET="votre_client_secret"
+   ```
+   (Idéalement persistant dans `~/.zshrc` ou `~/.bashrc`, puis `source` du fichier.)
+3. Lancez Claude Code en pointant sur le plugin :
+   ```bash
+   claude --plugin-dir ~/berryer
+   ```
+4. Dans Claude Code, vérifiez : `/plugin` doit lister `berryer` sans erreur
+5. Premier test : tapez `piste_status` puis `/berryer:recherche article 1240 code civil`
+
+### Parcours 3 — Accès au repo GitHub privé (cabinets avec dev/IT)
+
+Si vous avez reçu une invitation GitHub sur le repo `demerys/berryer` :
+
+```bash
+git clone https://github.com/demerys/berryer
+cd berryer/mcp-server && npm install && npm run build
+cd .. && claude --plugin-dir .
+```
+
+Pour mettre à jour à chaque release : `git pull` à la racine + `cd mcp-server && npm run build`.
+
+---
+
+## Que tester en priorité ?
+
+Voici **6 prompts** qui couvrent l'essentiel des capacités. Donnez-nous votre retour sur chacun.
+
+### Test 1 — Recherche simple
+```
+Quel est le texte exact de l'article 1240 du Code civil ?
+```
+*Attendu : texte intégral + état (VIGUEUR) + dates + lien Légifrance.*
+
+### Test 2 — Recherche complexe avec délégation à Cassin
+```
+Quels sont les arrêts récents de la Cour de cassation (depuis 2024) 
+sur la prescription de l'action en nullité d'une transaction ?
+```
+*Attendu : délégation auto à Cassin, 3-5 arrêts cités au format français rigoureux, attendus en blockquote, liens Légifrance vérifiables.*
+
+### Test 3 — Analyse fiscale avec Colbert
+```
+Mon client passe en micro-BNC en 2026. Donne-moi les seuils, 
+les conditions, et explique-moi le risque vis-à-vis de la franchise TVA.
+```
+*Attendu : délégation auto à Colbert, citation simultanée du CGI (art. 102 ter, 293 B) ET de la doctrine BOFiP (BOI-BNC-DECLA-…), disclaimer rescrit.*
+
+### Test 4 — Note de synthèse complète avec Portalis
+```
+Sur la base de l'arrêt Cass. soc. du 8 octobre 2025 n° 23-23.501, 
+rédige-moi une note client : un employeur peut-il encore contester 
+la nullité d'une transaction signée en 2018 ?
+```
+*Attendu : délégation à Portalis, structure en 4 sections (faits / question / discussion / conclusion), niveau de confiance explicite, disclaimer.*
+
+### Test 5 — Traduction de contrat avec David
+```
+Décrypte cette clause d'un SaaS agreement Delaware : "Customer shall 
+indemnify and hold Provider harmless from any third-party claims arising 
+from Customer's misuse of the Service, including reasonable attorneys' 
+fees and court costs." Risques côté droit français ?
+```
+*Attendu : délégation à David, signalement explicite du faux-ami `indemnification`, mention de l'art. 1231-3 C. civ. sur la prévisibilité, identification des risques (pas de cap, attorneys' fees inclus).*
+
+### Test 6 — Veille thématique avec Dupin
+```
+Veille sur les modifications du Code de la consommation depuis 2025.
+```
+*Attendu : délégation à Dupin, tableau ou prose chronologique avec NOR + lien Légifrance pour chaque texte, synthèse en 5 axes.*
+
+---
+
+## Comment nous remonter les bugs et retours
+
+### Bug technique (le plugin crashe, message d'erreur incompréhensible, etc.)
+
+**Email** : contact@demerys.com avec en objet `[BERRYER BETA] <résumé court>` et :
+- Le prompt qui a déclenché le bug
+- La sortie complète de Claude (copier-coller du texte)
+- Si possible : la sortie de `piste_status` pour confirmer que la connexion PISTE fonctionne
+- Le parcours d'install (Cowork / Claude Code / GitHub)
+
+### Retour qualitatif (les agents délèguent mal, citations à confirmer, etc.)
+
+Idem : `[BERRYER BETA] <retour>`. Pas besoin d'être structuré, on prend en l'état.
+
+### Citation suspecte ou incorrecte
+
+**Critique** — c'est le pire défaut possible pour notre produit. Si vous trouvez une citation qui ne pointe pas vers le bon texte / arrêt sur Légifrance, dites-le-nous immédiatement. Cela nous permet de corriger un éventuel bug d'extraction.
+
+---
+
+## Confidentialité — engagements de Demerys
+
+Engagements pris vis-à-vis de vous en tant que beta testeur :
+
+1. **Vos credentials PISTE** sont stockés dans le keychain de votre OS. Ils ne quittent jamais votre poste.
+2. **Le serveur MCP** du plugin tourne localement sur votre machine. Aucune intermédiation.
+3. **Vos requêtes** Légifrance/BOFiP partent en direct depuis votre poste vers `api.piste.gouv.fr`. Demerys n'a aucune visibilité.
+4. **Aucune télémétrie** dans le plugin.
+5. **Code source ouvert** et auditable pour les testeurs ayant accès au repo GitHub.
+6. **Vos retours** : les bugs et suggestions que vous nous envoyez ne contiennent pas de données client (sauf si vous nous les envoyez explicitement). Restez sur des cas anonymisés ou des prompts génériques quand vous documentez.
+
+Si vous décidez de ne pas continuer le programme beta, votre version locale du plugin continue de fonctionner avec vos propres credentials PISTE — il n'y a rien à désinstaller côté serveur (puisqu'il n'y a pas de serveur).
+
+---
+
+## Troubleshooting
+
+### Erreur 403 ou « API non souscrite »
+
+→ Allez sur [piste.gouv.fr](https://piste.gouv.fr) → Mes applications → onglet APIs souscrites → vérifiez que **Légifrance** est dans la liste avec statut actif. Si manquante, souscrivez (validation immédiate à quelques heures).
+
+### Le plugin ne se charge pas dans Claude Code
+
+→ Lancez `claude --plugin-dir . --debug` pour voir les logs. Souvent : oubli de `npm install && npm run build` dans `mcp-server/`.
+
+### Cowork affiche un avertissement sécurité sur les MCP locaux
+
+→ C'est normal et attendu. Ce message indique que le plugin embarque un serveur MCP qui tournera sur votre machine — c'est précisément l'effet recherché pour la confidentialité (vos données ne quittent pas votre poste). Voir section Confidentialité.
+
+### Une citation dans la réponse de Cassin/Portalis n'a pas de lien Légifrance fonctionnel
+
+→ Bug critique. Email immédiat à contact@demerys.com avec le prompt + la citation erronée + la sortie complète de la réponse.
+
+### Hoquet PISTE — message « Hoquet temporaire de l'infrastructure PISTE »
+
+→ Comportement attendu. La passerelle PISTE a des micro-pannes. Le plugin retry automatiquement jusqu'à 5 fois. Si le message persiste après 1 minute, **reposez la même question** — ça fonctionnera.
+
+### Mon Claude Code dit « le plugin n'a pas accès aux outils MCP »
+
+→ Vérifiez que le serveur MCP est bien construit (`mcp-server/dist/index.js` existe), et que vos env vars `PISTE_CLIENT_ID` / `PISTE_CLIENT_SECRET` sont bien chargées dans le shell d'où vous lancez Claude Code (`echo $PISTE_CLIENT_ID` doit afficher votre ID).
+
+---
+
+## Calendrier indicatif du programme beta
+
+| Phase | Durée | Action |
+|---|---|---|
+| Onboarding | semaine 1 | Réception du zip + premiers tests sur les 6 prompts type |
+| Usage en conditions réelles | semaines 2-3 | Vous utilisez le plugin sur vos dossiers en cours, vous remontez les retours au fil de l'eau |
+| Bilan & ajustements | semaine 4 | Demerys consolide les retours, fait les ajustements urgents, communique sur la sortie publique |
+| Sortie publique | après | Le plugin passe en marketplace publique. Vous pouvez basculer sur l'install marketplace officielle si vous le souhaitez. |
+
+---
+
+## Contact
+
+- **Email** : contact@demerys.com
+- **Objet email standard** : `[BERRYER BETA] <résumé>`
+- **Site** : [demerys.com](https://demerys.com)
+
+Merci pour votre temps et votre confiance.

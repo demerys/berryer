@@ -19,11 +19,11 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
 
-# 1. Lire la version depuis marketplace.json
+# 1. Lire la version depuis le package.json racine
 if [[ $# -ge 1 ]]; then
   VERSION="$1"
 else
-  VERSION=$(node -p "require('./.claude-plugin/marketplace.json').metadata.version")
+  VERSION=$(node -p "require('./package.json').version")
 fi
 echo "▶ Version : $VERSION"
 

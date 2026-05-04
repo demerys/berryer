@@ -5,10 +5,6 @@
     "email": "contact@demerys.com",
     "url": "https://demerys.com"
   },
-  "metadata": {
-    "description": "Suite de plugins juridiques français pour avocats, juristes et experts-comptables. Accès Légifrance et BOFiP via PISTE, agents juridiques nommés selon les figures du droit français.",
-    "version": "0.2.0"
-  },
   "plugins": [
     {
       "name": "berryer",

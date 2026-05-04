@@ -35,16 +35,23 @@ Sur la page de votre application :
 
 ### 3. Ajouter la marketplace Demerys dans Cowork
 
+La suite Berryer est distribuée comme une **marketplace unique** dans le repo GitHub `demerys/berryer`. Le repo contient à la fois les 3 plugins (généraliste, affaires, social) et le manifeste de la marketplace (`.claude-plugin/marketplace.json` à la racine). Pas de second repo séparé.
+
 1. Ouvrez **Claude Desktop**.
 2. Onglet **Cowork** → **Customize** (sidebar gauche).
 3. Bouton **+** → **Add marketplace from GitHub**.
-4. Collez l'URL : `https://github.com/demerys/jurisconsultes-marketplace`
-5. Validez.
+4. Collez l'URL : `https://github.com/demerys/berryer`
+5. Validez. La marketplace **berryer-suite** apparaît avec ses 3 plugins.
 
-### 4. Installer le plugin
+### 4. Installer le plugin de votre choix
 
-1. Dans le catalogue de marketplaces, cliquez sur **berryer**.
-2. **Install**.
+Dans le catalogue, choisissez selon votre profil :
+
+- **berryer** — cabinet généraliste (Dupin, Cassin, Colbert, Portalis, David)
+- **berryer-affaires** — droit des affaires (Thaller, Ripert, Houin, Guyon)
+- **berryer-social** — droit du travail (Durand, Lyon-Caen, Despax, Camerlynck)
+
+Cliquez **Install** sur le plugin choisi. Pour un cabinet pluri-disciplinaire, vous pouvez en installer plusieurs — ils coexistent et coopèrent dans la même session.
 
 ### 5. Configurer les credentials PISTE
 
@@ -119,11 +126,17 @@ echo $PISTE_CLIENT_ID  # doit afficher votre ID
 
 ```bash
 claude
-> /plugin marketplace add demerys/jurisconsultes-marketplace
-> /plugin install berryer@jurisconsultes-marketplace
+> /plugin marketplace add demerys/berryer
+> /plugin install berryer@berryer-suite
 ```
 
-Le plugin se charge. Vérifiez avec `/plugin` que `berryer` est listé sans erreur.
+Pour un cabinet pluri-disciplinaire, ajouter aussi :
+```
+> /plugin install berryer-affaires@berryer-suite
+> /plugin install berryer-social@berryer-suite
+```
+
+Le ou les plugins se chargent. Vérifiez avec `/plugin` qu'ils sont listés sans erreur.
 
 ### 3. Premier test
 
@@ -142,9 +155,10 @@ ou directement appel d'un tool :
 Pour vérifier que vos credentials PISTE fonctionnent en dehors de Claude Code :
 
 ```bash
-git clone https://github.com/demerys/jurisconsultes-marketplace
-cd jurisconsultes-marketplace/berryer
-node scripts/verify-piste.mjs
+git clone https://github.com/demerys/berryer
+cd berryer
+npm install
+node plugins/berryer/scripts/verify-piste.mjs
 ```
 
 Vous devez voir `✅ Connectivité PISTE/Légifrance OK.`

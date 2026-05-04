@@ -190,7 +190,7 @@ piste_status
 
 Voir [INSTALL.md](./INSTALL.md) pour le guide complet en deux parcours :
 - **Parcours A — Cowork (sans terminal)** : `Customize → + → Add marketplace from GitHub → Install`. Recommandé pour avocats / experts-comptables non-tech.
-- **Parcours B — Claude Code (terminal)** : `/plugin marketplace add demerys/jurisconsultes-marketplace` puis `/plugin install berryer`.
+- **Parcours B — Claude Code (terminal)** : `/plugin marketplace add demerys/berryer` puis `/plugin install berryer@berryer-suite`.
 
 Dans tous les cas, vous aurez besoin d'un compte **PISTE** ([piste.gouv.fr](https://piste.gouv.fr)) avec souscription aux API Légifrance et BOFiP.
 

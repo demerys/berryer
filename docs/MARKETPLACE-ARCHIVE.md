@@ -1,4 +1,16 @@
-# Création du repo marketplace `demerys/jurisconsultes-marketplace`
+# ⚠️ ARCHIVE — Document obsolète
+
+> **Cette stratégie a été abandonnée en mai 2026.** Le repo `demerys/jurisconsultes-marketplace` n'a jamais été créé. À la place, le manifeste `marketplace.json` a été placé **directement à la racine du monorepo `demerys/berryer`** (cf. `.claude-plugin/marketplace.json`). Un seul repo, plus besoin de second repo séparé.
+>
+> **Architecture actuelle** : voir `CLAUDE.md` à la racine du monorepo.
+>
+> **Commande d'install actuelle** : `/plugin marketplace add demerys/berryer` puis `/plugin install <plugin>@berryer-suite` (où `<plugin>` est `berryer`, `berryer-affaires` ou `berryer-social`).
+>
+> Le contenu ci-dessous est conservé pour l'historique uniquement.
+
+---
+
+# Création du repo marketplace `demerys/jurisconsultes-marketplace` (abandonné)
 
 Ce repo (`berryer`) contient le plugin lui-même. Pour le distribuer aux utilisateurs Cowork et Claude Code, il faut un **second repo public** qui sert de marketplace.
 

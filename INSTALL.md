@@ -13,6 +13,7 @@ Aucune compétence technique requise. Compter ~10 minutes.
 - Un abonnement **Claude Pro, Max, Team ou Enterprise** (les plugins Cowork sont réservés aux plans payants).
 - L'app **Claude Desktop** installée (macOS ou Windows).
 - Un compte **PISTE** créé sur [piste.gouv.fr](https://piste.gouv.fr).
+- **Node.js ≥ 20 installé sur votre poste** ([nodejs.org/fr](https://nodejs.org/fr), version LTS, installeur en 4 clics). Le plugin embarque un petit serveur en JavaScript qui parle à Légifrance ; sans Node, il ne démarre pas — c'est valable autant pour Cowork que pour Claude Code. Pour vérifier : ouvrez un terminal et tapez `node --version` (vous devez voir `v20.x` ou supérieur).
 
 ### 1. Créer une application PISTE
 

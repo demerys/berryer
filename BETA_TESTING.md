@@ -27,6 +27,32 @@ Vous testez **avant tout le monde** un cabinet juridique virtuel français branc
 
 ---
 
+## Pré-requis indispensables
+
+Avant tout, vérifiez ces 3 éléments. Sans eux, le plugin ne fonctionnera pas — ce ne sont pas des suggestions.
+
+### 1. Node.js ≥ 20 installé sur votre poste
+
+**Pourquoi** : le plugin contient un petit serveur écrit en JavaScript qui tourne sur votre machine pour parler à Légifrance. Sans Node, ce serveur ne démarre pas, qu'on soit sur Cowork ou Claude Code.
+
+**Comment vérifier** : ouvrez un terminal et tapez `node --version`. Vous devez voir `v20.x.x` ou supérieur. Si la commande retourne « not found » ou une version inférieure, installez :
+
+- **macOS / Windows / Linux** : téléchargez la version LTS sur [nodejs.org/fr](https://nodejs.org/fr) et lancez l'installeur (4 clics, ~30 secondes). Validez tous les défauts proposés.
+- **Alternative macOS via Homebrew** : `brew install node`
+- **Alternative Windows via winget** : `winget install OpenJS.NodeJS.LTS`
+
+Après installation, fermez et rouvrez votre terminal pour que Node soit reconnu.
+
+### 2. Compte PISTE actif avec API Légifrance souscrite
+
+Voir étape « Créer une application PISTE » plus bas.
+
+### 3. Pour Cowork uniquement : abonnement Claude Pro/Max/Team/Enterprise
+
+Les plugins Cowork ne sont pas accessibles sur le plan gratuit. Pour Claude Code (terminal), pas de contrainte.
+
+---
+
 ## Installation
 
 Selon votre profil et votre outil principal, choisissez le parcours.

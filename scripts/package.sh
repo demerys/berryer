@@ -109,7 +109,7 @@ Le plugin a besoin de votre **Client ID** et **Client Secret** PISTE. Avant de l
 
 ## Pré-requis communs
 
-- **Node.js ≥ 20** (pour le script de configuration et le serveur MCP du plugin)
+- **Node.js ≥ 20** sur votre poste — *obligatoire* car le plugin embarque un petit serveur JS qui tourne localement pour parler à Légifrance. Sans Node, le plugin ne démarrera pas, peu importe que vous utilisiez Cowork ou Claude Code. Téléchargement LTS : https://nodejs.org/fr (4 clics). Vérification : \`node --version\` dans un terminal doit afficher \`v20.x\` ou plus.
 - Un **compte PISTE** ([piste.gouv.fr](https://piste.gouv.fr)) avec souscription aux API Légifrance et BOFiP
 - Un abonnement Claude Pro/Max/Team/Enterprise (pour Cowork uniquement)
 

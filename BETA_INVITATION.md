@@ -23,6 +23,7 @@
 > Pré-requis :
 > - Un compte sur [piste.gouv.fr](https://piste.gouv.fr) (gratuit, 5 minutes de création) avec souscription à l'API Légifrance — qu'on peut vous aider à configurer si besoin
 > - Un abonnement Claude (Pro, Max, Team ou Enterprise) — la version Pro à 22€/mois suffit pour le test
+> - Node.js ≥ 20 installé sur votre poste (téléchargement gratuit en 4 clics sur nodejs.org/fr — c'est le moteur que le plugin utilise pour parler à Légifrance, indispensable même avec Cowork)
 >
 > Confidentialité : vos credentials PISTE et vos requêtes restent **localement** sur votre poste. Demerys n'a accès à aucune donnée client. Le code source est ouvert et auditable. Cet engagement est documenté techniquement dans le plugin.
 >
@@ -51,7 +52,7 @@
 >
 > L'agent fiscal s'appelle **Colbert** — un clin d'œil au surintendant des finances de Louis XIV. Il y a aussi des agents pour la veille (Dupin), la jurisprudence (Cassin), la traduction de contrats (David) et la rédaction de notes (Portalis).
 >
-> Ce qu'on vous propose : 2 à 4 semaines d'accès gratuit, 6 prompts test à dérouler quand vous voulez, vos retours par email. Pré-requis : compte gratuit [piste.gouv.fr](https://piste.gouv.fr) avec souscription API Légifrance et BOFiP, et un abonnement Claude (à partir de 22€/mois).
+> Ce qu'on vous propose : 2 à 4 semaines d'accès gratuit, 6 prompts test à dérouler quand vous voulez, vos retours par email. Pré-requis : compte gratuit [piste.gouv.fr](https://piste.gouv.fr) avec souscription API Légifrance et BOFiP, abonnement Claude (à partir de 22€/mois), et Node.js installé sur le poste (téléchargement gratuit nodejs.org/fr en 4 clics — moteur indispensable au plugin).
 >
 > **Confidentialité** : aucune donnée ne quitte votre poste. Vos clés PISTE sont stockées dans le keychain de votre OS, le serveur MCP du plugin tourne localement, vos requêtes partent en direct vers les serveurs de la DILA. Demerys n'a aucune visibilité.
 >

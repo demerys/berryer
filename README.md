@@ -122,7 +122,8 @@ Si Cowork affiche un avertissement de sécurité concernant les MCP locaux, il f
 
 ## Licence
 
-- **Code** : MIT
+- **Code** : **Apache License 2.0** — voir [LICENSE](./LICENSE) et [NOTICE](./NOTICE). Politique d'usage des marques : [TRADEMARK.md](./TRADEMARK.md).
+- **Éditeur** : DEMERYS INVESTMENT, SAS au capital de 200 000 €, RCS Béziers 803 315 225, 23 avenue Auguste Albertini, 34500 Béziers
 - **Données Légifrance/BOFiP** : Licence Ouverte v2.0 (Etalab) — s'applique aux contenus que vous récupérez via le plugin
 - **Disclaimer** : Berryer fournit un **accès aux sources officielles** et une aide à la recherche/rédaction. **Il ne fournit pas de conseil juridique**. Toute interprétation reste sous la responsabilité du professionnel utilisateur.
 

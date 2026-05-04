@@ -20,5 +20,7 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "typescript": "^5.7.0"
-  }
+  },
+  "author": "DEMERYS INVESTMENT <contact@demerys.com> (https://demerys.com)",
+  "license": "Apache-2.0"
 }

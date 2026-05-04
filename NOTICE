@@ -1,0 +1,117 @@
+Berryer Suite — Plugins juridiques pour Claude
+Copyright (c) 2026 DEMERYS INVESTMENT
+
+
+Identité de la personne morale (article L. 123-1 du Code de commerce)
+─────────────────────────────────────────────────────────────────────
+
+  Dénomination sociale     : DEMERYS INVESTMENT
+  Forme juridique          : Société par actions simplifiée (SAS)
+  Capital social           : 200 000,00 euros
+  Immatriculation          : RCS Béziers 803 315 225
+  Numéro de gestion        : 2014B00675
+  Date d'immatriculation   : 4 juillet 2014
+  Siège social             : 23 avenue Auguste Albertini, 34500 Béziers, France
+  Activité principale      : Conseil pour les affaires et autres conseils de gestion
+                             (NAF 70.22Z)
+  Noms commerciaux         : DEMERYS, DIVAVEO
+
+
+Représentants légaux
+────────────────────
+
+  Présidente               : Mme Camille GALIBERT (nom d'usage : CERVERA)
+  Directeur général        : M. Thomas GALIBERT
+
+
+Contact
+───────
+
+  Email                    : contact@demerys.com
+  Site                     : https://demerys.com
+
+
+Licence du code source
+──────────────────────
+
+  Le code source de la suite Berryer (incluant les plugins berryer,
+  berryer-affaires, berryer-social et le package partagé @berryer/core)
+  est diffusé sous Apache License, Version 2.0. Une copie de cette
+  licence figure dans le fichier LICENSE à la racine du dépôt et est
+  également disponible à l'adresse :
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+
+Marques, identité commerciale et nomenclature des agents
+────────────────────────────────────────────────────────
+
+  Les dénominations « Berryer », « Berryer Suite », « Berryer Affaires »,
+  « Berryer Social », ainsi que les noms commerciaux « Demerys » et
+  « Divaveo », constituent des éléments de l'identité commerciale de
+  DEMERYS INVESTMENT.
+
+  La nomenclature des agents et skills (Berryer, Dupin, Cassin, Colbert,
+  Portalis, David, Domat, Pothier, Gény, Thaller, Ripert, Houin, Guyon,
+  Demogue, Durand, Lyon-Caen, Despax, Camerlynck, Rouast) emprunte les
+  noms de juristes français décédés et tombés dans le domaine public.
+  Cet emprunt s'inscrit dans une démarche d'identité produit cohérente
+  et culturelle, n'affectant pas les droits patrimoniaux ou moraux de
+  tiers.
+
+  Conformément à l'article 6 de l'Apache License 2.0, la présente
+  licence n'autorise pas l'utilisation des marques, dénominations
+  commerciales ou noms de produits du Concédant. Toute réutilisation
+  commerciale du nom « Berryer » comme dénomination d'un produit ou
+  service dérivé est soumise à autorisation préalable de DEMERYS
+  INVESTMENT (contact@demerys.com).
+
+  Voir le fichier TRADEMARK.md pour la politique détaillée d'usage des
+  marques.
+
+
+Données juridiques (Légifrance, BOFiP, KALI)
+─────────────────────────────────────────────
+
+  Les données accessibles via la suite Berryer proviennent des sources
+  publiques françaises diffusées par la DILA (Direction de l'information
+  légale et administrative) sous Licence Ouverte v2.0 d'Etalab.
+
+  Cette licence s'applique aux contenus récupérés (textes du Code,
+  jurisprudences, conventions collectives, fiches BOFiP) et est
+  indépendante de la licence Apache 2.0 qui régit le code de la suite.
+
+  Référence : https://www.etalab.gouv.fr/licence-ouverte-open-licence
+
+
+Disclaimer juridique
+────────────────────
+
+  La suite Berryer fournit un accès aux sources juridiques officielles
+  françaises (Légifrance, BOFiP, KALI) et une aide à la recherche, à
+  la rédaction et à la mise en forme. Elle ne fournit pas de conseil
+  juridique au sens des articles 54 et suivants de la loi n° 71-1130
+  du 31 décembre 1971 portant réforme de certaines professions
+  judiciaires et juridiques.
+
+  Toute interprétation des textes ou décisions, et toute application à
+  une situation déterminée, restent sous l'entière responsabilité du
+  professionnel utilisateur (avocat, juriste, expert-comptable ou
+  équivalent).
+
+
+Confidentialité et conformité RGPD
+──────────────────────────────────
+
+  Le serveur MCP de chaque plugin tourne localement sur le poste de
+  l'utilisateur. Les credentials PISTE et les requêtes émises ne
+  transitent ni par les serveurs de DEMERYS INVESTMENT, ni par ceux
+  d'Anthropic. Aucune télémétrie n'est embarquée dans le code distribué.
+
+  DEMERYS INVESTMENT n'a ainsi aucune visibilité sur les requêtes
+  effectuées par l'utilisateur, ce qui constitue une garantie de
+  conformité au secret professionnel (article 226-13 du Code pénal pour
+  les avocats, articles 23 et 26 du Code de déontologie des
+  experts-comptables) et au RGPD pour les éventuelles données à
+  caractère personnel manipulées par l'utilisateur dans le cadre de
+  ses missions.

@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "description": "Berryer — Accès aux API Légifrance et BOFiP via PISTE, avec agents juridiques spécialisés (Dupin, Cassin, Colbert, Portalis). Pour avocats, juristes et experts-comptables.",
   "author": {
-    "name": "Demerys",
+    "name": "DEMERYS INVESTMENT",
     "email": "contact@demerys.com",
     "url": "https://demerys.com"
   },
   "homepage": "https://demerys.com/berryer",
-  "repository": "https://github.com/demerys/jurisconsultes-marketplace",
-  "license": "MIT",
+  "repository": "https://github.com/demerys/berryer",
+  "license": "Apache-2.0",
   "keywords": [
     "légifrance",
     "bofip",

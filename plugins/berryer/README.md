@@ -235,7 +235,7 @@ Si Claude Cowork affiche un avertissement de sécurité concernant les MCP locau
 
 ## Licences et conformité
 
-- **Code du plugin** : licence MIT, voir [LICENSE](./LICENSE).
+- **Code du plugin** : licence **Apache 2.0**, voir [LICENSE](../../LICENSE) et [NOTICE](../../NOTICE) à la racine du monorepo. Pour la politique d'usage des marques « Berryer » et « Demerys » : voir [TRADEMARK.md](../../TRADEMARK.md).
 - **Données Légifrance et BOFiP** : diffusées par la DILA et la DGFiP sous **Licence Ouverte v2.0** ([Etalab](https://www.etalab.gouv.fr/wp-content/uploads/2017/04/ETALAB-Licence-Ouverte-v2.0.pdf)). Cette licence s'applique aux contenus que vous récupérez via le plugin.
 - **RGPD** : le plugin ne collecte ni ne transmet aucune donnée personnelle. Vos requêtes ne sont stockées qu'en cache local.
 - **Disclaimer** : Berryer fournit un **accès aux sources officielles** et une aide à la recherche/rédaction. **Il ne fournit pas de conseil juridique**. Toute interprétation reste sous la responsabilité du professionnel utilisateur.

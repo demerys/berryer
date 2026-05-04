@@ -44,12 +44,25 @@ function loadCredentialsFile(): CredentialsFile | undefined {
   }
 }
 
+/**
+ * Cowork (Claude Desktop) ne substitue pas les placeholders `${VAR}` du bloc
+ * `env` d'un `.mcp.json` quand la variable n'est pas dans l'env du processus.
+ * Au lieu de passer une string vide, il passe la chaîne littérale `${VAR}` au
+ * MCP server. Sans cette détection, le loader croit que la variable est
+ * définie et ne fallback pas sur `~/.config/berryer/credentials.json`.
+ */
+function cleanEnv(v: string | undefined): string | undefined {
+  if (!v) return undefined;
+  if (/^\$\{[^}]+\}$/.test(v)) return undefined;
+  return v;
+}
+
 export function loadConfig(): Config {
   // 1. Source primaire : variables d'environnement (Claude Code lancé depuis
   //    un shell qui source ~/.zshrc, ou env passées via .mcp.json).
-  let clientId = process.env.PISTE_CLIENT_ID;
-  let clientSecret = process.env.PISTE_CLIENT_SECRET;
-  let envOverride = process.env.PISTE_ENV;
+  let clientId = cleanEnv(process.env.PISTE_CLIENT_ID);
+  let clientSecret = cleanEnv(process.env.PISTE_CLIENT_SECRET);
+  let envOverride = cleanEnv(process.env.PISTE_ENV);
   let source: "env" | "file" | "none" = clientId && clientSecret ? "env" : "none";
 
   // 2. Fallback : fichier ~/.config/berryer/credentials.json

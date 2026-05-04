@@ -55779,10 +55779,17 @@ function loadCredentialsFile() {
     return void 0;
   }
 }
+function cleanEnv(v) {
+  if (!v)
+    return void 0;
+  if (/^\$\{[^}]+\}$/.test(v))
+    return void 0;
+  return v;
+}
 function loadConfig() {
-  let clientId = process.env.PISTE_CLIENT_ID;
-  let clientSecret = process.env.PISTE_CLIENT_SECRET;
-  let envOverride = process.env.PISTE_ENV;
+  let clientId = cleanEnv(process.env.PISTE_CLIENT_ID);
+  let clientSecret = cleanEnv(process.env.PISTE_CLIENT_SECRET);
+  let envOverride = cleanEnv(process.env.PISTE_ENV);
   let source = clientId && clientSecret ? "env" : "none";
   if (source === "none") {
     const fileCreds = loadCredentialsFile();

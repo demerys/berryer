@@ -1,0 +1,24 @@
+{
+  "name": "@berryer/plugin-social-server",
+  "version": "0.1.0",
+  "description": "Entrypoint MCP du plugin berryer-social (importe @berryer/core).",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "dev": "tsc -p . --watch",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "@berryer/core": "*",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}

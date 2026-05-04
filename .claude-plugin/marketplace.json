@@ -14,6 +14,16 @@
       "name": "berryer",
       "source": "./plugins/berryer",
       "description": "Cabinet juridique virtuel généraliste : 5 agents (Dupin/veille, Cassin/jurisprudence, Colbert/fiscal, Portalis/rédaction, David/traduction) + 3 skills méthodologiques (Domat/note, Pothier/consultation, Gény/citations). Pour cabinets pluri-disciplinaires."
+    },
+    {
+      "name": "berryer-affaires",
+      "source": "./plugins/berryer-affaires",
+      "description": "Cabinet droit des affaires : 4 agents (Thaller/rédaction commerciale, Ripert/jurisprudence Cass. com., Houin/procédures collectives, Guyon/sociétés) + skill Demogue (note de risque transactionnel). Pour avocats et juristes en droit des sociétés et contentieux commercial."
+    },
+    {
+      "name": "berryer-social",
+      "source": "./plugins/berryer-social",
+      "description": "Cabinet droit du travail : 4 agents (Durand/individuel, Lyon-Caen/CSE et collectif, Despax/CCN, Camerlynck/procédure prud'homale) + skill Rouast (méthode CCN + structure note prud'homale). Pour avocats et juristes en droit social."
     }
   ]
 }

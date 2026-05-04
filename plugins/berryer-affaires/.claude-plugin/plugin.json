@@ -1,0 +1,24 @@
+{
+  "name": "berryer-affaires",
+  "version": "0.1.0",
+  "description": "Berryer Affaires — Cabinet virtuel droit des affaires : agents Thaller (rédaction commerciale), Ripert (jurisprudence Cass. com.), Houin (procédures collectives), Guyon (sociétés). Connecté à Légifrance via PISTE.",
+  "author": {
+    "name": "Demerys",
+    "email": "contact@demerys.com",
+    "url": "https://demerys.com"
+  },
+  "homepage": "https://demerys.com/berryer",
+  "repository": "https://github.com/demerys/berryer",
+  "license": "MIT",
+  "keywords": [
+    "légifrance",
+    "droit-des-affaires",
+    "code-de-commerce",
+    "sociétés",
+    "procédures-collectives",
+    "juridique",
+    "avocat",
+    "piste",
+    "berryer"
+  ]
+}

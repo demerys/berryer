@@ -52,7 +52,7 @@ Le plugin a besoin de votre Client ID et Client Secret PISTE pour interroger Lé
 1. Localisez le dossier d'installation du plugin (Cowork le télécharge automatiquement, le chemin est visible dans Customize → berryer → emplacement local).
 2. Ouvrez un terminal dans ce dossier (Finder → clic droit → « Nouveau terminal au dossier » sur macOS) et lancez :
    ```bash
-   bash scripts/setup-credentials.sh
+   node scripts/setup-credentials.mjs
    ```
 3. Le script vous demande vos credentials, les enregistre dans `~/.config/berryer/credentials.json` (lecture restreinte à votre utilisateur), et fait un test de connexion immédiat.
 4. Quittez Claude Desktop complètement (Cmd+Q sur macOS) et relancez. Le plugin lira votre fichier au prochain démarrage.
@@ -95,7 +95,7 @@ Au choix, l'une des deux voies :
 
 **Voie A — Script interactif (recommandée, marche partout)** :
 ```bash
-cd ~/berryer && bash scripts/setup-credentials.sh
+cd ~/berryer && node scripts/setup-credentials.mjs
 ```
 Crée `~/.config/berryer/credentials.json` (mode 600, lecture restreinte). Le plugin lit ce fichier en fallback si l'environnement shell ne contient pas les credentials.
 
@@ -143,7 +143,7 @@ Pour vérifier que vos credentials PISTE fonctionnent en dehors de Claude Code :
 ```bash
 git clone https://github.com/demerys/jurisconsultes-marketplace
 cd jurisconsultes-marketplace/berryer
-bash scripts/verify-piste.sh
+node scripts/verify-piste.mjs
 ```
 
 Vous devez voir `✅ Connectivité PISTE/Légifrance OK.`

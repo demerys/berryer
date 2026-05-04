@@ -9,7 +9,7 @@ Trois scénarios manuels à exécuter dans Claude Code (ou Cowork) une fois le p
 ```bash
 export PISTE_CLIENT_ID=…
 export PISTE_CLIENT_SECRET=…
-bash scripts/verify-piste.sh   # doit afficher ✅
+node scripts/verify-piste.mjs   # doit afficher ✅
 claude --plugin-dir /Users/thomas/code/claude/plugins/berryer
 ```
 

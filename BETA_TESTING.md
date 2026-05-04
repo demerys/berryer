@@ -36,7 +36,7 @@ Selon votre profil et votre outil principal, choisissez le parcours.
 Le plugin a besoin de votre **Client ID** et **Client Secret** PISTE. Le moyen le plus simple, valable pour tous les parcours :
 
 ```bash
-bash scripts/setup-credentials.sh
+node scripts/setup-credentials.mjs
 ```
 
 Ce script interactif vous demande vos credentials, les enregistre dans `~/.config/berryer/credentials.json` (mode 600 — lecture/écriture pour vous uniquement), et fait un test de connexion immédiat. **Aucune donnée n'est envoyée sur Internet hors de l'appel test à PISTE.**
@@ -52,7 +52,7 @@ Avantage : ça marche dans **tous les contextes** — Cowork lancé en GUI sur m
 1. Décompressez le zip que vous avez reçu (ex: `~/berryer`).
 2. Ouvrez un terminal dans ce dossier (Finder → clic droit sur le dossier → « Nouveau terminal au dossier » sur macOS) et lancez :
    ```bash
-   bash scripts/setup-credentials.sh
+   node scripts/setup-credentials.mjs
    ```
    Saisissez votre Client ID et Client Secret PISTE quand le script vous le demande.
 3. Ouvrez **Claude Desktop** → onglet **Cowork** → **Customize**.
@@ -70,7 +70,7 @@ Si le plugin ne charge pas ou si `piste_status` retourne une erreur, voir [Troub
 1. Décompressez le zip où vous voulez (ex: `~/berryer`).
 2. Lancez le script de configuration :
    ```bash
-   cd ~/berryer && bash scripts/setup-credentials.sh
+   cd ~/berryer && node scripts/setup-credentials.mjs
    ```
 3. Lancez Claude Code en pointant sur le plugin :
    ```bash
@@ -88,7 +88,7 @@ Si vous avez reçu une invitation GitHub sur le repo `demerys/berryer` :
 ```bash
 git clone https://github.com/demerys/berryer
 cd berryer/mcp-server && npm install && npm run build
-cd .. && bash scripts/setup-credentials.sh
+cd .. && node scripts/setup-credentials.mjs
 claude --plugin-dir .
 ```
 
@@ -205,16 +205,16 @@ Si vous décidez de ne pas continuer le programme beta, votre version locale du 
 ### Mon Claude Code dit « le plugin n'a pas accès aux outils MCP »
 
 → Vérifiez que le serveur MCP est bien construit (`mcp-server/dist/index.js` existe), et qu'au moins une des deux sources de credentials est configurée :
-- Soit le fichier `~/.config/berryer/credentials.json` existe (lancez `bash scripts/setup-credentials.sh` si non)
+- Soit le fichier `~/.config/berryer/credentials.json` existe (lancez `node scripts/setup-credentials.mjs` si non)
 - Soit les env vars `PISTE_CLIENT_ID` / `PISTE_CLIENT_SECRET` sont chargées dans le shell
 
 Tapez `piste_status` dans Claude Code, le champ `credentialsSource` doit valoir `"env"` ou `"file"` (jamais `"none"`).
 
 ### Cowork a installé le plugin mais `piste_status` dit `credentialsSource: "none"`
 
-→ Vous n'avez pas (encore) lancé `setup-credentials.sh`. Ouvrez un terminal, allez dans le dossier du plugin (celui que vous avez uploadé dans Cowork), et lancez :
+→ Vous n'avez pas (encore) lancé `setup-credentials.mjs`. Ouvrez un terminal, allez dans le dossier du plugin (celui que vous avez uploadé dans Cowork), et lancez :
 ```bash
-bash scripts/setup-credentials.sh
+node scripts/setup-credentials.mjs
 ```
 Puis quittez Cowork complètement (Cmd+Q) et relancez. Cowork va relire le fichier de credentials au prochain démarrage du serveur MCP.
 

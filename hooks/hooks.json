@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-piste-env.sh"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/check-piste-env.mjs"
           }
         ]
       }

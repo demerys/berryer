@@ -59,6 +59,9 @@ rsync -a \
   --exclude='SPEC_*.md' \
   --exclude='MARKETPLACE.md' \
   --exclude='CLAUDE.md' \
+  --exclude='scripts/package.sh' \
+  --exclude='scripts/capture-fixture.sh' \
+  --exclude='scripts/setup.sh' \
   ./ "$PKG_PATH/"
 
 # 6. S'assurer que mcp-server/dist/ est bien dans le zip (rsync l'inclut par défaut)
@@ -73,33 +76,40 @@ cat > "$PKG_PATH/README_BETA.md" <<EOF
 
 Vous recevez ce package dans le cadre d'un programme de test privé.
 
-## Installation rapide
+## Installation rapide — étape commune (macOS, Windows, Linux)
 
-### Vous utilisez Claude Cowork (UI graphique, sans terminal)
+Le plugin a besoin de votre **Client ID** et **Client Secret** PISTE. Avant de l'installer dans Cowork ou Claude Code, configurez les credentials une fois pour toutes :
+
+1. Décompressez ce dossier où vous voulez.
+2. Ouvrez un terminal dans ce dossier :
+   - **macOS** : Finder → clic droit sur le dossier → « Nouveau terminal au dossier »
+   - **Windows** : ouvrez le dossier dans l'Explorateur → barre d'adresse → tapez \`cmd\` puis Entrée
+   - **Linux** : clic droit dans le dossier → « Ouvrir dans un terminal »
+3. Lancez :
+   \`\`\`
+   node scripts/setup-credentials.mjs
+   \`\`\`
+4. Le script vous demande votre Client ID et Client Secret PISTE, les enregistre localement (lecture restreinte), et fait un test de connexion.
+
+### Vous utilisez Claude Cowork (UI graphique)
 
 1. Ouvrez **Claude Desktop** → onglet **Cowork** → **Customize**
-2. Bouton **+** → **Upload plugin** → sélectionnez ce dossier (ou son zip)
+2. Bouton **+** → **Upload plugin** → sélectionnez ce dossier
 3. Le plugin **berryer** apparaît, cliquez **Install**
-4. Saisissez vos credentials PISTE (Client ID + Client Secret) dans le formulaire
-5. Premier test : tapez \`/berryer:recherche article 1240 code civil\`
+4. Quittez complètement Claude Desktop (Cmd+Q sur macOS, Quitter sur Windows) et relancez
+5. Premier test : tapez \`piste_status\` puis \`/berryer:recherche article 1240 code civil\`
 
 ### Vous utilisez Claude Code (terminal)
 
-1. Décompressez ce dossier où vous voulez (ex: \`~/berryer\`)
-2. Définissez vos credentials PISTE dans \`~/.zshrc\` (ou \`~/.bashrc\`) :
-   \`\`\`bash
-   export PISTE_CLIENT_ID="…"
-   export PISTE_CLIENT_SECRET="…"
+1. Lancez Claude Code en pointant sur ce dossier :
    \`\`\`
-3. \`source ~/.zshrc\`
-4. Lancez Claude Code en pointant vers le plugin :
-   \`\`\`bash
-   claude --plugin-dir ~/berryer
+   claude --plugin-dir .
    \`\`\`
-5. Premier test : \`/berryer:recherche article 1240 code civil\`
+2. Premier test : tapez \`piste_status\` puis \`/berryer:recherche article 1240 code civil\`
 
 ## Pré-requis communs
 
+- **Node.js ≥ 20** (pour le script de configuration et le serveur MCP du plugin)
 - Un **compte PISTE** ([piste.gouv.fr](https://piste.gouv.fr)) avec souscription aux API Légifrance et BOFiP
 - Un abonnement Claude Pro/Max/Team/Enterprise (pour Cowork uniquement)
 

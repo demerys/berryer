@@ -32,7 +32,7 @@
 > Bien à vous,
 >
 > [Votre nom]
-> Demerys — contact@demerys.com — demerys.com
+> Demerys — formulaire de contact sur demerys.com — site officiel : berryer-landing.netlify.app
 
 ---
 
@@ -61,7 +61,7 @@
 > Bien cordialement,
 >
 > [Votre nom]
-> Demerys — contact@demerys.com — demerys.com
+> Demerys — formulaire de contact sur demerys.com — site officiel : berryer-landing.netlify.app
 
 ---
 
@@ -83,7 +83,7 @@
 >
 > Si t'es partant, ton handle GitHub et je t'invite. Sinon dis-moi, on enverra en zip à un de tes associés.
 >
-> [Votre nom] / Demerys — contact@demerys.com
+> [Votre nom] / Demerys — formulaire sur demerys.com
 
 ---
 

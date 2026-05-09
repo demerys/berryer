@@ -131,7 +131,6 @@ berryer/
   "description": "Berryer — Accès aux API Légifrance et BOFiP via PISTE, avec agents juridiques spécialisés (Dupin, Cassin, Colbert, Portalis). Pour avocats, juristes et experts-comptables.",
   "author": {
     "name": "Demerys",
-    "email": "contact@demerys.com",
     "url": "https://demerys.com"
   },
   "homepage": "https://demerys.com/berryer",

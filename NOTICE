@@ -27,8 +27,9 @@ Représentants légaux
 Contact
 ───────
 
-  Email                    : contact@demerys.com
   Site                     : https://demerys.com
+  Landing Berryer          : https://berryer-landing.netlify.app/
+  Toute correspondance     : via le formulaire de contact du site
 
 
 Licence du code source
@@ -36,11 +37,20 @@ Licence du code source
 
   Le code source de la suite Berryer (incluant les plugins berryer,
   berryer-affaires, berryer-social et le package partagé @berryer/core)
-  est diffusé sous Apache License, Version 2.0. Une copie de cette
-  licence figure dans le fichier LICENSE à la racine du dépôt et est
-  également disponible à l'adresse :
+  est diffusé sous Licence publique de l'Union européenne, version 1.2
+  (EUPL-1.2). Une copie de cette licence figure dans le fichier LICENSE
+  à la racine du dépôt et est également disponible à l'adresse :
 
-      http://www.apache.org/licenses/LICENSE-2.0
+      https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+
+  Sous licence EUPL.
+
+  L'EUPL est une licence libre rédigée par la Commission européenne,
+  juridiquement valide dans les 24 langues officielles de l'Union et
+  conçue pour être conforme au droit européen du droit d'auteur. Elle
+  comporte une clause copyleft compatible avec d'autres licences libres
+  classiques (GPL v2/v3, AGPL v3, MPL v2, CeCILL, etc. — voir l'appendice
+  de la licence).
 
 
 Marques, identité commerciale et nomenclature des agents
@@ -59,12 +69,13 @@ Marques, identité commerciale et nomenclature des agents
   et culturelle, n'affectant pas les droits patrimoniaux ou moraux de
   tiers.
 
-  Conformément à l'article 6 de l'Apache License 2.0, la présente
-  licence n'autorise pas l'utilisation des marques, dénominations
-  commerciales ou noms de produits du Concédant. Toute réutilisation
-  commerciale du nom « Berryer » comme dénomination d'un produit ou
-  service dérivé est soumise à autorisation préalable de DEMERYS
-  INVESTMENT (contact@demerys.com).
+  L'EUPL ne concède aucun droit d'usage des marques, dénominations
+  commerciales ou noms de produits du donneur de licence (cf. art. 3
+  in fine de la licence, qui réserve les droits non explicitement
+  concédés). Toute réutilisation commerciale du nom « Berryer » comme
+  dénomination d'un produit ou service dérivé est soumise à autorisation
+  préalable de DEMERYS INVESTMENT (formulaire de contact sur
+  https://demerys.com).
 
   Voir le fichier TRADEMARK.md pour la politique détaillée d'usage des
   marques.
@@ -79,7 +90,7 @@ Données juridiques (Légifrance, BOFiP, KALI)
 
   Cette licence s'applique aux contenus récupérés (textes du Code,
   jurisprudences, conventions collectives, fiches BOFiP) et est
-  indépendante de la licence Apache 2.0 qui régit le code de la suite.
+  indépendante de l'EUPL-1.2 qui régit le code de la suite.
 
   Référence : https://www.etalab.gouv.fr/licence-ouverte-open-licence
 

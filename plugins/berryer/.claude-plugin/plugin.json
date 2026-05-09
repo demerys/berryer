@@ -1,15 +1,14 @@
 {
   "name": "berryer",
   "version": "0.1.0",
-  "description": "Berryer — Accès aux API Légifrance et BOFiP via PISTE, avec agents juridiques spécialisés (Dupin, Cassin, Colbert, Portalis). Pour avocats, juristes et experts-comptables.",
+  "description": "Berryer — Cabinet juridique virtuel français généraliste dans Claude. 6 agents (Berryer/orchestrateur, Dupin, Cassin, Colbert, Portalis, David) + 3 skills méthodologiques (Domat, Pothier, Gény). Accès Légifrance & BOFiP via PISTE. Pour avocats, juristes et experts-comptables.",
   "author": {
     "name": "DEMERYS INVESTMENT",
-    "email": "contact@demerys.com",
     "url": "https://demerys.com"
   },
-  "homepage": "https://demerys.com/berryer",
+  "homepage": "https://berryer-landing.netlify.app/",
   "repository": "https://github.com/demerys/berryer",
-  "license": "Apache-2.0",
+  "license": "EUPL-1.2",
   "keywords": [
     "légifrance",
     "bofip",

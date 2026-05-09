@@ -60,6 +60,6 @@ Identique à `berryer` généraliste. Vos credentials et requêtes ne quittent j
 
 ## Licence
 
-**Apache 2.0** côté code. Voir [LICENSE](../../LICENSE) et [NOTICE](../../NOTICE) à la racine du monorepo. Pour la politique d'usage des marques : [TRADEMARK.md](../../TRADEMARK.md).
+**EUPL-1.2** (Licence publique de l'Union européenne v1.2) côté code. Voir [LICENSE](../../LICENSE) et [NOTICE](../../NOTICE) à la racine du monorepo. Pour la politique d'usage des marques : [TRADEMARK.md](../../TRADEMARK.md).
 
 Les données Légifrance/BOFiP relèvent de la **Licence Ouverte v2.0** (Etalab) et restent diffusées sous cette licence.

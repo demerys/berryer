@@ -24,7 +24,7 @@ Toute reprise de cette nomenclature dans un produit dérivé doit cependant veil
 
 ## Usages autorisés sans accord préalable
 
-Conformément à l'article 6 de l'Apache License 2.0 et au principe de loyauté commerciale, vous pouvez **sans autorisation préalable** :
+Conformément à l'EUPL-1.2 (qui ne concède aucun droit d'usage des marques) et au principe de loyauté commerciale, vous pouvez **sans autorisation préalable** :
 
 1. **Citer** les noms « Berryer », « Demerys », ou un agent particulier dans un contexte factuel : article de presse, billet de blog, présentation académique, comparatif de produits, support de formation.
 
@@ -32,11 +32,11 @@ Conformément à l'article 6 de l'Apache License 2.0 et au principe de loyauté 
 
 3. **Indiquer** que votre projet est compatible avec ou intégré à un plugin Berryer (par exemple : « compatible avec Berryer Affaires v0.2 »).
 
-4. **Forker le code source** sous Apache 2.0 et publier votre fork, à condition que le fork soit clairement nommé différemment et que les notices de copyright et NOTICE soient préservées.
+4. **Forker le code source** sous EUPL-1.2 et publier votre fork, à condition que le fork soit clairement nommé différemment, que la licence EUPL-1.2 et ses notices (LICENSE, NOTICE) soient préservées, et que les modifications soient diffusées sous une licence compatible (cf. appendice de l'EUPL : EUPL-1.2 elle-même, GPL v2/v3, AGPL v3, MPL v2, CeCILL, etc.).
 
 ## Usages soumis à autorisation préalable
 
-Une autorisation écrite préalable de DEMERYS INVESTMENT (contact@demerys.com) est requise pour :
+Une autorisation écrite préalable de DEMERYS INVESTMENT (via le formulaire de contact sur [demerys.com](https://demerys.com)) est requise pour :
 
 1. **Distribuer un produit ou service commercial** sous le nom « Berryer », « Demerys », ou une variation susceptible de créer une confusion (ex. « Berryer Pro », « Demerys Cloud », « MaSuite Berryer »).
 
@@ -50,7 +50,7 @@ Une autorisation écrite préalable de DEMERYS INVESTMENT (contact@demerys.com) 
 
 ## Comment demander une autorisation
 
-Envoyez un courriel à **contact@demerys.com** avec :
+Utilisez le **formulaire de contact** sur [demerys.com](https://demerys.com) en précisant en objet `[BERRYER TRADEMARK]` et en joignant :
 
 - Votre identité (personne physique ou morale, contact)
 - L'usage envisagé (produit, support, contexte commercial ou non)
@@ -69,6 +69,6 @@ DEMERYS INVESTMENT peut faire évoluer la présente politique. Les modifications
 
 ---
 
-**Dernière mise à jour** : 4 mai 2026
-**Contact** : contact@demerys.com
+**Dernière mise à jour** : 9 mai 2026
+**Contact** : formulaire sur [demerys.com](https://demerys.com)
 **Société** : DEMERYS INVESTMENT, SAS au capital de 200 000 €, RCS Béziers 803 315 225, 23 avenue Auguste Albertini, 34500 Béziers

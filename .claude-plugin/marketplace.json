@@ -2,14 +2,13 @@
   "name": "berryer-suite",
   "owner": {
     "name": "DEMERYS INVESTMENT",
-    "email": "contact@demerys.com",
     "url": "https://demerys.com"
   },
   "plugins": [
     {
       "name": "berryer",
       "source": "./plugins/berryer",
-      "description": "Cabinet juridique virtuel généraliste : 5 agents (Dupin/veille, Cassin/jurisprudence, Colbert/fiscal, Portalis/rédaction, David/traduction) + 3 skills méthodologiques (Domat/note, Pothier/consultation, Gény/citations). Pour cabinets pluri-disciplinaires."
+      "description": "Cabinet juridique virtuel généraliste : 6 agents (Berryer/orchestrateur, Dupin/veille, Cassin/jurisprudence, Colbert/fiscal, Portalis/rédaction, David/traduction) + 3 skills méthodologiques (Domat/note, Pothier/consultation, Gény/citations). Pour cabinets pluri-disciplinaires."
     },
     {
       "name": "berryer-affaires",

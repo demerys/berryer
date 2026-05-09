@@ -4,12 +4,11 @@
   "description": "Berryer Social — Cabinet virtuel droit du travail et droit social : agents Durand (droit individuel), Lyon-Caen (rapports collectifs / CSE), Despax (négociation collective / CCN), Camerlynck (procédure prud'homale). Connecté à Légifrance et aux conventions collectives KALI via PISTE.",
   "author": {
     "name": "DEMERYS INVESTMENT",
-    "email": "contact@demerys.com",
     "url": "https://demerys.com"
   },
-  "homepage": "https://demerys.com/berryer",
+  "homepage": "https://berryer-landing.netlify.app/",
   "repository": "https://github.com/demerys/berryer",
-  "license": "Apache-2.0",
+  "license": "EUPL-1.2",
   "keywords": [
     "légifrance",
     "droit-du-travail",

@@ -175,11 +175,13 @@ Veille sur les modifications du Code de la consommation depuis 2025.
 
 ### Bug technique (le plugin crashe, message d'erreur incompréhensible, etc.)
 
-**Email** : contact@demerys.com avec en objet `[BERRYER BETA] <résumé court>` et :
+**Canal privilégié — issue GitHub** : ouvrir une issue sur [demerys/berryer/issues](https://github.com/demerys/berryer/issues) avec le label `beta` et en titre `[BETA] <résumé court>`. Joindre :
 - Le prompt qui a déclenché le bug
 - La sortie complète de Claude (copier-coller du texte)
 - Si possible : la sortie de `piste_status` pour confirmer que la connexion PISTE fonctionne
 - Le parcours d'install (Cowork / Claude Code / GitHub)
+
+**Alternative** : formulaire de contact sur [demerys.com](https://demerys.com), objet `[BERRYER BETA]`. À privilégier si vos exemples contiennent des éléments de dossier client que vous ne voulez pas mettre en clair sur GitHub.
 
 ### Retour qualitatif (les agents délèguent mal, citations à confirmer, etc.)
 
@@ -222,7 +224,7 @@ Si vous décidez de ne pas continuer le programme beta, votre version locale du 
 
 ### Une citation dans la réponse de Cassin/Portalis n'a pas de lien Légifrance fonctionnel
 
-→ Bug critique. Email immédiat à contact@demerys.com avec le prompt + la citation erronée + la sortie complète de la réponse.
+→ Bug critique. Ouvrez une issue GitHub immédiate avec le label `beta-citation` et joignez le prompt + la citation erronée + la sortie complète de la réponse. Si le prompt contient des éléments confidentiels, passez par le formulaire de contact sur [demerys.com](https://demerys.com) à la place.
 
 ### Hoquet PISTE — message « Hoquet temporaire de l'infrastructure PISTE »
 
@@ -259,8 +261,8 @@ Puis quittez Cowork complètement (Cmd+Q) et relancez. Cowork va relire le fichi
 
 ## Contact
 
-- **Email** : contact@demerys.com
-- **Objet email standard** : `[BERRYER BETA] <résumé>`
-- **Site** : [demerys.com](https://demerys.com)
+- **Issues GitHub** : [demerys/berryer/issues](https://github.com/demerys/berryer/issues) — canal privilégié pour bugs et retours non sensibles
+- **Formulaire éditeur** : [demerys.com](https://demerys.com) — objet `[BERRYER BETA]`, à privilégier pour les retours qui contiennent des éléments confidentiels
+- **Site officiel** : [berryer-landing.netlify.app](https://berryer-landing.netlify.app/)
 
 Merci pour votre temps et votre confiance.

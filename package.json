@@ -15,8 +15,8 @@
   "engines": {
     "node": ">=20"
   },
-  "author": "DEMERYS INVESTMENT <contact@demerys.com> (https://demerys.com)",
-  "license": "Apache-2.0",
+  "author": "DEMERYS INVESTMENT (https://demerys.com)",
+  "license": "EUPL-1.2",
   "devDependencies": {
     "esbuild": "^0.28.0"
   }

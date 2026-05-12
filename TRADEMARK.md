@@ -1,6 +1,15 @@
-# Politique d'usage des marques — Suite Berryer
+# Politique d'usage des marques — Demerys
 
 DEMERYS INVESTMENT (SAS au capital de 200 000 €, RCS Béziers 803 315 225) est titulaire des droits sur les éléments d'identité commerciale listés ci-après. La présente politique précise les usages autorisés et les usages soumis à autorisation préalable.
+
+## Périmètre de la présente politique
+
+Cette politique porte exclusivement sur les noms commerciaux de l'éditeur. Elle **ne couvre pas** :
+
+- Le nom « Berryer » et les variantes de gamme (« Berryer Suite », « Berryer Affaires », « Berryer Social »), qui empruntent le patronyme de juristes français décédés tombés dans le domaine public — DEMERYS INVESTMENT n'en revendique aucun droit privatif.
+- Les noms d'agents et de skills de la suite (Dupin, Cassin, Colbert, Portalis, David, Domat, Pothier, Gény, Thaller, Ripert, Houin, Guyon, Demogue, Durand, Lyon-Caen, Despax, Camerlynck, Rouast), pour la même raison.
+
+Cet emprunt à la doctrine juridique française s'inscrit dans une démarche d'identité produit cohérente et culturelle, n'affectant ni les droits patrimoniaux ni les droits moraux de tiers.
 
 ## Marques et dénominations protégées
 
@@ -9,48 +18,39 @@ Les éléments suivants relèvent de l'identité commerciale de DEMERYS INVESTME
 | Dénomination | Nature | Usage autorisé sans accord |
 |---|---|---|
 | **DEMERYS** | Nom commercial enregistré | Citation factuelle (« édité par Demerys »), lien vers https://demerys.com |
+| **DEMERYS INVESTMENT** | Dénomination sociale | Citation factuelle (mentions légales, identification d'éditeur) |
 | **DIVAVEO** | Nom commercial | Citation factuelle uniquement |
-| **BERRYER** | Nom de la suite logicielle | Citation de référence (« plugin Berryer », « suite Berryer ») |
-| **BERRYER SUITE**, **BERRYER AFFAIRES**, **BERRYER SOCIAL** | Variantes de gamme | Citation de référence |
-| Logos Berryer / Demerys (le cas échéant) | Identité visuelle | Reproduction telle quelle dans documentation officielle |
-
-## Nomenclature des agents et skills
-
-Les noms d'agents et de skills utilisés dans la suite (Dupin, Cassin, Colbert, Portalis, David, Domat, Pothier, Gény, Thaller, Ripert, Houin, Guyon, Demogue, Durand, Lyon-Caen, Despax, Camerlynck, Rouast) sont des **noms de juristes français décédés**, tombés dans le domaine public.
-
-L'usage que DEMERYS INVESTMENT en fait s'inscrit dans une démarche d'identité produit cohérente et culturelle. Il n'affecte ni le droit moral, ni les droits patrimoniaux d'éventuels ayants droit, ces noms n'étant ni des marques déposées ni des œuvres protégées.
-
-Toute reprise de cette nomenclature dans un produit dérivé doit cependant veiller à ne pas créer de confusion avec la suite Berryer.
+| Logo Demerys (le cas échéant) | Identité visuelle | Reproduction telle quelle dans documentation officielle |
 
 ## Usages autorisés sans accord préalable
 
 Conformément à l'EUPL-1.2 (qui ne concède aucun droit d'usage des marques) et au principe de loyauté commerciale, vous pouvez **sans autorisation préalable** :
 
-1. **Citer** les noms « Berryer », « Demerys », ou un agent particulier dans un contexte factuel : article de presse, billet de blog, présentation académique, comparatif de produits, support de formation.
+1. **Citer** le nom « Demerys » dans un contexte factuel : article de presse, billet de blog, présentation académique, comparatif de produits, support de formation, mention de l'éditeur d'un projet libre.
 
-2. **Référencer** la suite par hyperlien depuis un site web ou un document.
+2. **Référencer** Demerys par hyperlien depuis un site web ou un document.
 
-3. **Indiquer** que votre projet est compatible avec ou intégré à un plugin Berryer (par exemple : « compatible avec Berryer Affaires v0.2 »).
+3. **Indiquer** que votre projet est compatible avec ou intégré à un produit édité par Demerys.
 
-4. **Forker le code source** sous EUPL-1.2 et publier votre fork, à condition que le fork soit clairement nommé différemment, que la licence EUPL-1.2 et ses notices (LICENSE, NOTICE) soient préservées, et que les modifications soient diffusées sous une licence compatible (cf. appendice de l'EUPL : EUPL-1.2 elle-même, GPL v2/v3, AGPL v3, MPL v2, CeCILL, etc.).
+4. **Forker le code source** de la suite Berryer sous EUPL-1.2 et publier votre fork, à condition que le fork soit clairement nommé différemment, que la licence EUPL-1.2 et ses notices (LICENSE, NOTICE) soient préservées, et que les modifications soient diffusées sous une licence compatible (cf. appendice de l'EUPL : EUPL-1.2 elle-même, GPL v2/v3, AGPL v3, MPL v2, CeCILL, etc.).
 
 ## Usages soumis à autorisation préalable
 
 Une autorisation écrite préalable de DEMERYS INVESTMENT (via le formulaire de contact sur [demerys.com](https://demerys.com)) est requise pour :
 
-1. **Distribuer un produit ou service commercial** sous le nom « Berryer », « Demerys », ou une variation susceptible de créer une confusion (ex. « Berryer Pro », « Demerys Cloud », « MaSuite Berryer »).
+1. **Distribuer un produit ou service commercial** sous le nom « Demerys » ou une variation susceptible de créer une confusion (ex. « Demerys Cloud », « Demerys Pro »).
 
-2. **Utiliser le nom Berryer ou Demerys dans une dénomination de société, de produit, de marque déposée**, ou un nom de domaine principal (ex. `berryer.fr`, `demerys-cloud.com`).
+2. **Utiliser le nom Demerys dans une dénomination de société, de produit, de marque déposée**, ou un nom de domaine principal (ex. `demerys-cloud.com`).
 
-3. **Apposer le logo Berryer ou Demerys** sur des supports commerciaux, packaging, présentations clients, sites web tiers.
+3. **Apposer le logo Demerys** sur des supports commerciaux, packaging, présentations clients, sites web tiers.
 
-4. **Revendre, sous-licencier ou commercialiser** un dérivé de la suite (en sortie open-source ou propriétaire) en utilisant les marques.
+4. **Revendre, sous-licencier ou commercialiser** un dérivé d'un produit Demerys (en sortie open-source ou propriétaire) en utilisant ces marques.
 
 5. **Affirmer publiquement un partenariat, un soutien, ou une certification** par DEMERYS INVESTMENT.
 
 ## Comment demander une autorisation
 
-Utilisez le **formulaire de contact** sur [demerys.com](https://demerys.com) en précisant en objet `[BERRYER TRADEMARK]` et en joignant :
+Utilisez le **formulaire de contact** sur [demerys.com](https://demerys.com) en précisant en objet `[TRADEMARK]` et en joignant :
 
 - Votre identité (personne physique ou morale, contact)
 - L'usage envisagé (produit, support, contexte commercial ou non)
@@ -69,6 +69,6 @@ DEMERYS INVESTMENT peut faire évoluer la présente politique. Les modifications
 
 ---
 
-**Dernière mise à jour** : 9 mai 2026
+**Dernière mise à jour** : 12 mai 2026
 **Contact** : formulaire sur [demerys.com](https://demerys.com)
 **Société** : DEMERYS INVESTMENT, SAS au capital de 200 000 €, RCS Béziers 803 315 225, 23 avenue Auguste Albertini, 34500 Béziers

@@ -155,10 +155,10 @@ Si Cowork affiche un avertissement de sécurité concernant les MCP locaux, il f
 
 ## Licences et mentions légales
 
-- **Code source** : **EUPL-1.2** (Licence publique de l'Union européenne v1.2) — voir [LICENSE](./LICENSE) et [NOTICE](./NOTICE). Politique d'usage des marques : [TRADEMARK.md](./TRADEMARK.md).
+- **Code source** : **EUPL-1.2** (Licence publique de l'Union européenne v1.2) — voir [LICENSE](./LICENSE) et [NOTICE](./NOTICE).
 - **Données Légifrance / BOFiP / KALI** : **Licence Ouverte v2.0** (Etalab) — s'applique aux contenus que vous récupérez via le plugin, indépendamment de l'EUPL.
-- **Éditeur** : DEMERYS INVESTMENT, SAS au capital de 200 000 €, RCS Béziers 803 315 225, 23 avenue Auguste Albertini, 34500 Béziers.
-- **Marques** : « Berryer » et « Demerys » sont des éléments d'identité commerciale de DEMERYS INVESTMENT — voir [TRADEMARK.md](./TRADEMARK.md) pour les usages autorisés.
+- **Éditeur** : DEMERYS INVESTMENT, SAS au capital de 200 000 €, RCS Béziers 803 315 225, 23 avenue Auguste Albertini, 34500 Béziers. Politique d'usage du nom commercial Demerys : [TRADEMARK.md](./TRADEMARK.md).
+- **Noms « Berryer », noms d'agents et de skills** : empruntés à des juristes français décédés tombés dans le domaine public ; aucun droit privatif n'est revendiqué sur ces noms.
 
 ---
 

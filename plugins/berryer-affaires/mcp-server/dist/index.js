@@ -57404,11 +57404,24 @@ function extractTitle(raw, type) {
   if (type === "JURITEXT") {
     return pickString(raw?.text?.titre, raw?.text?.titreLong, raw?.titre);
   }
-  return pickString(raw?.title, raw?.titre, raw?.titreLong, raw?.text?.titre, raw?.text?.titreLong, raw?.article?.titre);
+  return pickString(raw?.title, raw?.titre, raw?.titreLong, raw?.article?.titre, raw?.text?.titre, raw?.text?.titreLong);
 }
 function extractScope(raw, type) {
   if (type === "KALITEXT") {
-    return pickString(raw?.contexte?.text?.titre, raw?.contexte?.text?.titreLong, raw?.contexte?.titre, raw?.cidTexte, raw?.parent?.titre);
+    const articles = raw?.articles;
+    if (Array.isArray(articles) && articles.length > 0) {
+      const first = articles[0];
+      const surtitre = pickString(first?.surtitre);
+      const content = pickString(first?.content);
+      if (content) {
+        const stripped = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+        const truncated = stripped.length > 300 ? stripped.slice(0, 300) + "\u2026" : stripped;
+        if (surtitre)
+          return `${surtitre} \u2014 ${truncated}`;
+        return truncated;
+      }
+    }
+    return pickString(raw?.contexte?.text?.titre, raw?.contexte?.text?.titreLong, raw?.contexte?.titre);
   }
   if (type === "JURITEXT") {
     const j = pickString(raw?.text?.juridiction);
@@ -57426,10 +57439,16 @@ async function validateRef(ref, http) {
   let body;
   switch (ref.type) {
     case "KALITEXT":
+      path = "/consult/kaliText";
+      body = { id: ref.id };
+      break;
     case "LEGITEXT":
-    case "JORFTEXT":
       path = "/consult/lawDecree";
       body = { textId: ref.id };
+      break;
+    case "JORFTEXT":
+      path = "/consult/jorf";
+      body = { textCid: ref.id };
       break;
     case "LEGIARTI":
       path = "/consult/getArticle";
@@ -57440,8 +57459,8 @@ async function validateRef(ref, http) {
       body = { textId: ref.id };
       break;
     case "BOI":
-      path = "/consult/jorfPart";
-      body = { searchedString: ref.id };
+      path = "/consult/circulaire";
+      body = { id: ref.id };
       break;
   }
   try {
@@ -57452,11 +57471,15 @@ async function validateRef(ref, http) {
     if (ref.type === "JURITEXT" && !raw?.text) {
       return { id: ref.id, type: ref.type, exists: false, url: url2, error: "d\xE9cision introuvable" };
     }
+    const title = extractTitle(raw, ref.type);
+    if (!title) {
+      return { id: ref.id, type: ref.type, exists: false, url: url2, error: "texte introuvable (r\xE9ponse sans titre)" };
+    }
     return {
       id: ref.id,
       type: ref.type,
       exists: true,
-      title: extractTitle(raw, ref.type),
+      title,
       scope: extractScope(raw, ref.type),
       url: url2
     };

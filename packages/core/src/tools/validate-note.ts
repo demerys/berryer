@@ -75,24 +75,42 @@ function extractTitle(raw: any, type: RefType): string | undefined {
   if (type === "JURITEXT") {
     return pickString(raw?.text?.titre, raw?.text?.titreLong, raw?.titre);
   }
+  // KALITEXT, LEGITEXT, JORFTEXT, LEGIARTI, BOI : `title` est au top-level
+  // pour la plupart des endpoints (kaliText, lawDecree, jorf, getArticle).
   return pickString(
     raw?.title,
     raw?.titre,
     raw?.titreLong,
+    raw?.article?.titre,
     raw?.text?.titre,
     raw?.text?.titreLong,
-    raw?.article?.titre,
   );
 }
 
 function extractScope(raw: any, type: RefType): string | undefined {
   if (type === "KALITEXT") {
+    // Pour une CCN racine, le titre top-level contient déjà la branche
+    // (« Convention collective nationale de la coiffure… »). Pour un avenant,
+    // le titre est neutre (« Avenant du 31 mars 2025 relatif aux salaires »)
+    // et le rattachement à la branche réelle se trouve dans le contenu du
+    // 1er article (« Champ d'application : la présente convention… »).
+    // C'est cette extraction qui rattrape le piège des branches.
+    const articles = raw?.articles;
+    if (Array.isArray(articles) && articles.length > 0) {
+      const first = articles[0];
+      const surtitre = pickString(first?.surtitre);
+      const content = pickString(first?.content);
+      if (content) {
+        const stripped = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+        const truncated = stripped.length > 300 ? stripped.slice(0, 300) + "…" : stripped;
+        if (surtitre) return `${surtitre} — ${truncated}`;
+        return truncated;
+      }
+    }
     return pickString(
       raw?.contexte?.text?.titre,
       raw?.contexte?.text?.titreLong,
       raw?.contexte?.titre,
-      raw?.cidTexte,
-      raw?.parent?.titre,
     );
   }
   if (type === "JURITEXT") {
@@ -112,10 +130,16 @@ async function validateRef(ref: RefMatch, http: PisteHttpClient): Promise<Valida
   let body: Record<string, string>;
   switch (ref.type) {
     case "KALITEXT":
+      path = "/consult/kaliText";
+      body = { id: ref.id };
+      break;
     case "LEGITEXT":
-    case "JORFTEXT":
       path = "/consult/lawDecree";
       body = { textId: ref.id };
+      break;
+    case "JORFTEXT":
+      path = "/consult/jorf";
+      body = { textCid: ref.id };
       break;
     case "LEGIARTI":
       path = "/consult/getArticle";
@@ -126,8 +150,8 @@ async function validateRef(ref: RefMatch, http: PisteHttpClient): Promise<Valida
       body = { textId: ref.id };
       break;
     case "BOI":
-      path = "/consult/jorfPart";
-      body = { searchedString: ref.id };
+      path = "/consult/circulaire";
+      body = { id: ref.id };
       break;
   }
 
@@ -139,11 +163,18 @@ async function validateRef(ref: RefMatch, http: PisteHttpClient): Promise<Valida
     if (ref.type === "JURITEXT" && !raw?.text) {
       return { id: ref.id, type: ref.type, exists: false, url, error: "décision introuvable" };
     }
+    // Pour les endpoints qui répondent toujours 200 avec un objet "creux"
+    // quand l'ID n'existe pas (cas observé sur /consult/kaliText, lawDecree,
+    // getArticle), on considère que l'absence de titre = référence inexistante.
+    const title = extractTitle(raw, ref.type);
+    if (!title) {
+      return { id: ref.id, type: ref.type, exists: false, url, error: "texte introuvable (réponse sans titre)" };
+    }
     return {
       id: ref.id,
       type: ref.type,
       exists: true,
-      title: extractTitle(raw, ref.type),
+      title,
       scope: extractScope(raw, ref.type),
       url,
     };

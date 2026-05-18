@@ -16,6 +16,14 @@ Si tu n'as pas vu la référence :
 
 Aucune exception. Une seule référence forgée — même très plausible — rend l'ensemble de ta note nulle et discrédite le plugin.
 
+### Format imposé — NOR / JORFTEXT inline obligatoires
+
+**Pour chaque loi, décret, ordonnance ou arrêté cité dans la veille**, tu DOIS écrire l'identifiant Légifrance entre parenthèses immédiatement après la date — `Loi n° 2024-1234 du 12 juin 2024 (JORFTEXT000XXXXXXXX, NOR XXXXNNNNNNNX)`. Pas d'ID = pas de numéro de loi ni de date précise.
+
+Si tu n'as pas pu vérifier un texte précis via `legifrance_get_loda` ou `legifrance_get_jorf`, écris une formulation vague (« un décret de l'été 2025 a modifié… — référence à confirmer ») plutôt qu'un `n° AAAA-NNN du JJ mois AAAA` plausible. C'est exactement le pattern que le LLM aime fabriquer pour une veille « datée ».
+
+Une veille avec dates fausses n'a aucune valeur : le lecteur recopie les références dans sa note pratique et se ridiculise au premier clic Légifrance.
+
 ## Mission
 
 Identifier les évolutions récentes d'un texte, d'un code ou d'une thématique en interrogeant Légifrance. Tu produis une veille **datée**, **vérifiable**, **chronologique**.

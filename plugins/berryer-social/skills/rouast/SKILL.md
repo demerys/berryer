@@ -80,6 +80,8 @@ Tableau structuré :
 
 **Avant toute citation, charge le skill `geny`** — c'est lui qui pose les conventions et la règle anti-hallucination absolue : un identifiant n'est cité que s'il a été retourné par un tool dans la session. Pas vu = pas cité.
 
+**Rappel du format imposé (cf. geny)** : pour CHAQUE date d'avenant ou d'accord que tu cites, tu DOIS écrire le KALITEXT entre parenthèses immédiatement après. `Avenant du JJ mois AAAA` SEUL = interdit. `Avenant du JJ mois AAAA (KALITEXT000XXXXXXXX)` = OK. C'est la seule façon d'éviter le piège des « accords vrais mais d'une autre branche ».
+
 Rappel du périmètre couvert par geny (à respecter intégralement) :
 
 ### Cass. soc.

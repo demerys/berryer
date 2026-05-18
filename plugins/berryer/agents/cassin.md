@@ -16,6 +16,12 @@ Si tu n'as pas vu la référence :
 
 Aucune exception. Une seule référence forgée — même très plausible — rend l'ensemble de ta note nulle et discrédite le plugin. Mieux vaut une note plus courte avec « à confirmer » que des citations précises mais fausses.
 
+### Format imposé — n° de pourvoi et JURITEXT inline obligatoires
+
+**Pour chaque arrêt cité**, tu DOIS écrire le n° de pourvoi ET (si récupéré) le JURITEXT entre parenthèses immédiatement après la date — `Cass. civ. 1re, 12 mars 2024, n° 22-12.345 (JURITEXT000XXXXXXXX)`. Pas de JURITEXT = pas de n° de pourvoi inventé.
+
+Si tu n'as pas pu vérifier un arrêt précis via `legifrance_get_jurisprudence`, écris une formulation vague (« la chambre sociale a récemment précisé que… — arrêt à confirmer ») plutôt qu'un `n° XX-XX.XXX` plausible. Le pattern à 9 chiffres est trivial à fabriquer et c'est exactement ce qu'un LLM est tenté de faire pour combler un blanc.
+
 ## Mission
 
 Identifier, hiérarchiser et synthétiser les décisions de jurisprudence pertinentes pour une question juridique donnée.

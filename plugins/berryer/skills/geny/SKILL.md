@@ -23,6 +23,37 @@ Une référence forgée — même très plausible, même avec le bon préfixe, m
 
 Un avocat qui transmet à son client une note citant `KALITEXT000053721692 — Avenant n° 51 du 3 décembre 2025 étendu par arrêté du 26 mars 2026` se ridiculise quand le client (ou l'avocat adverse) clique sur le lien Légifrance et obtient une 404. Le préjudice de réputation, pour l'avocat comme pour le plugin, est immédiat et durable. Une note plus courte qui dit « grille de salaires 2025-2026 à confirmer sur le PDF officiel — je n'ai pas pu récupérer l'avenant via l'API » est mille fois préférable.
 
+## Format imposé — identifiant inline obligatoire
+
+**Pour CHAQUE date d'acte juridique citée dans le corps d'une note** (avenant CCN, accord d'entreprise, loi, décret, arrêté JO, arrêt), tu DOIS l'accompagner **immédiatement** de son identifiant Légifrance entre parenthèses. **Pas d'identifiant = pas de date précise.** Substitue par une formulation vague (« courant 2025 », « avant 2024 », « dernier avenant en date ») ou par « à confirmer ».
+
+C'est la règle qui ferme la dernière échappatoire d'hallucination : un LLM peut être tenté de citer « avenant du 31 mars 2025 » qu'il a vu passer dans son training data sans avoir vérifié qu'il s'applique à la bonne branche. Lui imposer l'identifiant inline force le passage par un tool — il ne peut écrire le KALITEXT qu'après l'avoir récupéré.
+
+### Format par type de texte
+
+| Type | Format obligatoire | Si non récupéré |
+|---|---|---|
+| CCN, avenant, accord interpro | `Avenant du JJ mois AAAA (KALITEXT000XXXXXXXX)` | `dernier avenant en date — référence à confirmer` |
+| Article de code | `art. L. XXX-X C. trav. (LEGIARTI000XXXXXXXX)` *ou* `art. L. XXX-X C. trav., texte en vigueur vérifié` | `art. L. XXX-X C. trav. — version à confirmer` |
+| Arrêt Cass. / CE | `Cass. soc., JJ mois AAAA, n° XX-XX.XXX (JURITEXT000XXXXXXXX)` | `Cass. soc. récent sur X — JP à confirmer` |
+| Loi / décret / arrêté JO | `Loi n° AAAA-NNN du JJ mois AAAA (JORFTEXT000XXXXXXXX, NOR XXXXXXNXNX)` | `loi récente sur X — référence à confirmer` |
+| Fiche BOFiP | `BOI-XX-YY-ZZ, publié le JJ mois AAAA (vérifié)` | `BOI relatif à X — à confirmer` |
+
+### Exemples ❌ / ✅
+
+❌ `Préavis régi par l'accord du 18 mars 2010 (étendu 4 nov. 2010), modifié par accord du 1er juillet 2015.`
+→ deux dates précises citées sans aucun KALITEXT. Si tu n'as pas vérifié, le LLM **peut très bien avoir confondu avec une autre branche** (c'est exactement le bug observé sur la coiffure : ces deux dates renvoient à la CCN distribution de films, pas coiffure).
+
+✅ `Préavis régi par l'accord du 18 mars 2010 (KALITEXT000023001468, étendu par arrêté du 4 novembre 2010, JORFTEXT…) — à vérifier que le champ d'application couvre bien la coiffure (IDCC 2596).`
+→ KALITEXT explicite, donc tu as vu le texte ; tu peux confirmer le champ d'application.
+
+✅ `Préavis régi par un accord de branche dont la date exacte est à confirmer sur le PDF officiel — je n'ai pas pu récupérer l'avenant via l'API dans cette session.`
+→ aucune date précise sortie, le lecteur sait qu'il doit aller vérifier.
+
+### Piège des branches — règle de vérification du périmètre
+
+Un KALITEXT est rattaché à **une seule CCN**. Avant de citer un avenant pour la CCN X, **vérifie via `legifrance_get_loda` que son champ d'application mentionne bien X** (par exemple coiffure IDCC 2596 et pas distribution de films IDCC 716). Si l'avenant existe mais dans la mauvaise branche, c'est encore une hallucination — plus subtile mais aussi grave.
+
 ## Règle n°2 — toute citation est vérifiable
 
 **Toute citation doit pouvoir être retrouvée** sur Légifrance ou dans une base de données reconnue par le lien fourni. Si tu ne peux pas générer un identifiant LEGIARTI / JURITEXT / BOI / NOR exact, n'invente rien — utilise `legifrance_recherche` ou `legifrance_suggest` pour retrouver la référence avant de citer.

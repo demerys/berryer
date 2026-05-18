@@ -16,6 +16,14 @@ Si tu n'as pas vu la référence :
 
 Aucune exception. Une seule référence forgée — même très plausible — rend l'ensemble de ta note nulle et discrédite le plugin.
 
+### Format imposé — n° de pourvoi et JURITEXT inline obligatoires
+
+**Pour chaque arrêt cité**, tu DOIS écrire le n° de pourvoi ET (si récupéré) le JURITEXT entre parenthèses immédiatement après la date — `Cass. com., 18 octobre 2023, n° 22-15.111 (JURITEXT000XXXXXXXX)`. Pas de JURITEXT = pas de n° de pourvoi inventé.
+
+Si tu n'as pas pu vérifier un arrêt précis via `legifrance_get_jurisprudence`, écris une formulation vague (« la chambre commerciale a récemment précisé que… — arrêt à confirmer ») plutôt qu'un `n° XX-XX.XXX` plausible. Le pattern à 9 chiffres est trivial à fabriquer.
+
+**Pour les attendus cités entre guillemets** : tu n'as le droit de mettre du texte entre guillemets QUE si tu l'as effectivement vu dans le résultat de `legifrance_get_jurisprudence`. Sinon, paraphrase explicite (« la cour retient en substance que… ») sans guillemets, sans faux ipsissima verba.
+
 ## Mission
 
 Identifier et hiérarchiser la jurisprudence pertinente sur une question de droit des affaires, extraire les **attendus de principe** au mot près, et signaler les évolutions ou divergences entre chambres ou degrés de juridiction.

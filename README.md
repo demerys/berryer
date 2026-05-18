@@ -168,7 +168,7 @@ Si Cowork affiche un avertissement de sécurité concernant les MCP locaux, il f
 - Tool `legifrance_diff` pour comparer deux versions d'un article
 - Tool `bofip_chronologie` pour les versions historiques d'une fiche
 - Tool `idcc_resolver` (plugin social) pour résoudre nom CCN ↔ IDCC
-- Tool `infogreffe_lookup` (plugin affaires) pour le registre des sociétés
+- Connexion **Pappers.fr** (plugin affaires) — accès direct aux sources RCS via votre clé API Pappers personnelle : identité juridique, mandataires sociaux, bénéficiaires effectifs, dépôts au greffe, comptes annuels
 - Marketplace privée d'organisation Cowork (clé en main, branding cabinet)
 - Internationalisation (Eur-Lex pour les cabinets transfrontaliers)
 

@@ -7,9 +7,25 @@ description: Conventions de citation juridique françaises rigoureuses — artic
 
 La citation juridique française a des conventions strictes. Une référence mal formée fait perdre toute crédibilité à un écrit professionnel et empêche le lecteur de vérifier la source.
 
-## Règle d'or — toujours vérifiable
+## Règle n°1 (absolue, non négociable) — tu n'inventes JAMAIS d'identifiant
 
-**Toute citation doit pouvoir être retrouvée** sur Légifrance ou dans une base de données reconnue. Si tu ne peux pas générer un identifiant LEGIARTI / JURITEXT / BOI / NOR exact, **n'invente rien** — utilise `legifrance_recherche` ou `legifrance_suggest` pour retrouver la référence avant de citer.
+Avant de citer un **KALITEXT**, **LEGIARTI**, **JORFTEXT**, **JURITEXT**, **BOI-…**, un **n° de pourvoi**, un **NOR**, un **IDCC**, un **n° d'avenant**, ou une **date d'arrêté d'extension JO**, cet identifiant doit avoir été **retourné par un tool dans la session courante** (`legifrance_get_*`, `legifrance_recherche`, `legifrance_suggest`).
+
+**Pas vu = pas cité.** Sans exception.
+
+Si tu n'as pas vu la référence :
+- soit tu l'obtiens MAINTENANT via le tool approprié (`legifrance_get_loda` / `legifrance_get_article` / `legifrance_get_jurisprudence` / `legifrance_get_circulaire` par ID, ou `legifrance_recherche` pour lister) ;
+- soit tu écris **« à confirmer (référence non vérifiée) »** — pas de numéro inventé, pas de date approximative, pas de chiffre précis tiré de mémoire.
+
+Une référence forgée — même très plausible, même avec le bon préfixe, même avec une date crédible — rend l'ensemble de la note nulle et discrédite tout le plugin Berryer. **C'est ce que les concurrents généralistes (ChatGPT, Claude seul) font et que Berryer ne doit JAMAIS faire.** C'est la promesse n°1 du produit.
+
+### Pourquoi cette règle est non négociable
+
+Un avocat qui transmet à son client une note citant `KALITEXT000053721692 — Avenant n° 51 du 3 décembre 2025 étendu par arrêté du 26 mars 2026` se ridiculise quand le client (ou l'avocat adverse) clique sur le lien Légifrance et obtient une 404. Le préjudice de réputation, pour l'avocat comme pour le plugin, est immédiat et durable. Une note plus courte qui dit « grille de salaires 2025-2026 à confirmer sur le PDF officiel — je n'ai pas pu récupérer l'avenant via l'API » est mille fois préférable.
+
+## Règle n°2 — toute citation est vérifiable
+
+**Toute citation doit pouvoir être retrouvée** sur Légifrance ou dans une base de données reconnue par le lien fourni. Si tu ne peux pas générer un identifiant LEGIARTI / JURITEXT / BOI / NOR exact, n'invente rien — utilise `legifrance_recherche` ou `legifrance_suggest` pour retrouver la référence avant de citer.
 
 ## Codes — articles
 
@@ -125,3 +141,12 @@ Quand tu donnes une citation, fournis aussi le lien Légifrance correspondant si
 ## Quand tu n'es pas sûr
 
 **Stop**. Plutôt qu'inventer une référence, écris : « jurisprudence à vérifier » ou « citation à confirmer », et appelle `legifrance_recherche` avec les éléments dont tu disposes pour retrouver la référence exacte. Une citation fausse fait plus de dégâts qu'une absence de citation.
+
+## Self-check final (obligatoire avant envoi)
+
+Avant de finaliser une note, **relis chaque identifiant cité** (KALITEXT, LEGIARTI, JURITEXT, JORFTEXT, BOI-…, n° de pourvoi, IDCC, n° d'avenant, date d'arrêté d'extension) et pose-toi pour chacun la question : *« Quel appel de tool m'a retourné cet identifiant dans cette session ? »*
+
+- Si tu peux pointer l'appel : OK, citation conservée.
+- Si tu ne peux pas : tu remplaces par **« à confirmer (référence non vérifiée) »** ou tu retires la citation. Pas d'exception.
+
+Cette relecture est plus importante que tout le reste : c'est elle qui protège la promesse de fiabilité de Berryer.

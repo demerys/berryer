@@ -78,6 +78,10 @@ Tableau structuré :
 
 ## Étape 3 — Conventions de citation sociales
 
+**Avant toute citation, charge le skill `geny`** — c'est lui qui pose les conventions et la règle anti-hallucination absolue : un identifiant n'est cité que s'il a été retourné par un tool dans la session. Pas vu = pas cité.
+
+Rappel du périmètre couvert par geny (à respecter intégralement) :
+
 ### Cass. soc.
 Format : `Cass. soc., JJ mois AAAA, n° XX-XX.XXX, FS-B+R` (préciser la formation et la publication).
 
@@ -107,9 +111,25 @@ Format : `Accord d'entreprise du JJ mois AAAA conclu au sein de la société Y (
 - `art. 2224 C. civ.` pour le droit civil applicable au social (transaction notamment)
 - `art. L. 169 LPF` pour le contentieux du recouvrement social par l'URSSAF
 
-### Règle d'or anti-hallucination
-**Aucune référence à un arrêt n'est citée si elle n'a pas été vérifiée via `legifrance_get_jurisprudence`** ou trouvée par `legifrance_recherche fond=JURI`. Si l'agent ne peut pas vérifier, il écrit « JP à confirmer » et appelle le tool.
+### Règle d'or anti-hallucination (étendue à tous les identifiants)
+
+**Aucun identifiant n'est cité s'il n'a pas été retourné par un tool dans la session** :
+- arrêt → vérifié via `legifrance_get_jurisprudence` ou trouvé via `legifrance_recherche fond=JURI`
+- article du Code du travail → vérifié via `legifrance_get_article` ou `legifrance_recherche fond=CODE_DATE`
+- CCN, avenant, accord interpro → vérifié via `legifrance_get_loda` (par KALITEXT) ou `legifrance_recherche fond=KALI`
+- arrêté d'extension JO → vérifié via `legifrance_get_jorf` (par JORFTEXT) ou `legifrance_recherche fond=JORF`
+
+Si l'agent ne peut pas vérifier (API en panne, ID rejeté, recherche infructueuse) : il écrit **« à confirmer (référence non vérifiée) »** et explique pourquoi il n'a pas pu vérifier. **Aucun KALITEXT, n° d'avenant, date d'arrêté d'extension ou coefficient ne doit être inventé pour combler le vide.**
+
+## Étape 4 — Self-check final (obligatoire avant envoi)
+
+Avant de remettre la note, **passe en revue chaque identifiant cité** (KALITEXT, LEGIARTI, JURITEXT, JORFTEXT, IDCC, n° d'avenant, date d'arrêté d'extension, coefficient de classification) et identifie l'appel de tool qui te l'a fourni. Si tu ne peux pas pointer l'appel pour une référence donnée, deux options :
+
+1. relancer le tool maintenant pour vérifier (`legifrance_get_loda` si tu as un KALITEXT, `legifrance_recherche` sinon) ;
+2. remplacer la citation par **« à confirmer (référence non vérifiée) »** et le signaler explicitement dans la note.
+
+Pas d'autre option. Une référence inventée — même très plausible — engage la responsabilité du professionnel utilisateur et discrédite le plugin.
 
 ## Format de sortie
 
-Markdown structuré, suivant la séquence Étape 1 → 2 → 3. Tableau de chiffrage des indemnités central. Citations rigoureuses. Disclaimer fin de note.
+Markdown structuré, suivant la séquence Étape 1 → 2 → 3 → 4. Tableau de chiffrage des indemnités central. Citations rigoureuses. Self-check effectué. Disclaimer fin de note.

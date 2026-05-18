@@ -18,17 +18,31 @@ Une consultation diffère d'une note de synthèse : elle vise à **conseiller un
 > 2. **Lire le titre du texte cible** et vérifier qu'il correspond bien à la branche, à la juridiction ou à la matière annoncée. Un identifiant Légifrance valide peut renvoyer à un texte d'une autre convention collective ou d'un autre code que celui visé — le titre seul fait foi.
 > 3. **Confirmer la version en vigueur** à la date d'application visée (le droit évolue, les avenants se succèdent).
 
-## Self-check final obligatoire — appel de `validate_note`
+## Self-check final obligatoire — appel de `validate_note` AVEC `expected_context`
 
-**Avant de remettre la consultation au lecteur, tu DOIS appeler le tool `validate_note` avec ta consultation finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités et vérifie pour chacun (a) son existence côté Légifrance, (b) son titre exact, (c) son champ d'application réel.
+**Avant de remettre la consultation au lecteur, tu DOIS appeler `validate_note` avec ta consultation finale ET le paramètre `expected_context`** qui dit ce que la consultation prétend couvrir. Format :
 
-Tu traites la réponse :
+```
+validate_note({
+  note: "<ta consultation finale en markdown>",
+  expected_context: {
+    code: "Code civil",          // si tu cites des LEGIARTI
+    branche: "coiffure",         // si tu cites une CCN
+    idcc: "2596",
+    juridiction: "Cour de cassation"  // si tu cites des arrêts
+  }
+})
+```
 
-- **Référence non vérifiable** → tu la retires ou tu la remplaces par « à confirmer (référence non vérifiée) ».
-- **Référence valide mais mal attribuée** (piège des branches : un KALITEXT d'une autre CCN, un LEGIARTI d'un autre code…) → tu la retires et tu cherches la bonne via `legifrance_recherche`, ou tu la remplaces par « à confirmer ».
+**Sans `expected_context`, le tool ne fait pas le cross-check sémantique** — il se contente de lister, à toi de comparer (et le LLM rate régulièrement ce cross-check). Avec `expected_context`, le tool retourne `isError: true` si une référence est invalide OU mal attribuée (piège des branches : un avenant CCN voisine cité comme l'avenant cible).
+
+Tu traites les flags :
+
+- **Référence non vérifiable** → retirée ou remplacée par « à confirmer (référence non vérifiée) ».
+- **🚨 PIÈGE DES BRANCHES DÉTECTÉ** → retirée et remplacée via `legifrance_recherche` ciblée, ou par « à confirmer ».
 - **Référence valide et bien attribuée** → conservée.
 
-Étape non négociable. C'est le garde-fou final, non-LLM, qui rattrape les hallucinations résiduelles qu'aucun prompt n'empêche totalement. Le poids d'une consultation juridique tient à la fiabilité de ses références — une référence inventée discrédite toute la recommandation.
+Étape non négociable. Le poids d'une consultation tient à la fiabilité de ses références — une seule référence mal attribuée discrédite toute la recommandation. Ré-appelle après correction jusqu'à ce que `isError: false`.
 
 ## Structure (méthode Pothier)
 

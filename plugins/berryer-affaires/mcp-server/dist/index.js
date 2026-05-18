@@ -2241,8 +2241,8 @@ var require_resolve = __commonJS({
       }
       return count;
     }
-    function getFullPath(resolver, id = "", normalize) {
-      if (normalize !== false)
+    function getFullPath(resolver, id = "", normalize2) {
+      if (normalize2 !== false)
         id = normalizeId(id);
       const p = resolver.parse(id);
       return _getFullPath(resolver, p);
@@ -3582,7 +3582,7 @@ var require_fast_uri = __commonJS({
     "use strict";
     var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = require_utils();
     var { SCHEMES, getSchemeHandler } = require_schemes();
-    function normalize(uri, options) {
+    function normalize2(uri, options) {
       if (typeof uri === "string") {
         uri = /** @type {T} */
         serialize(parse3(uri, options), options);
@@ -3818,7 +3818,7 @@ var require_fast_uri = __commonJS({
     }
     var fastUri = {
       SCHEMES,
-      normalize,
+      normalize: normalize2,
       resolve: resolve2,
       resolveComponent,
       equal,
@@ -57400,6 +57400,57 @@ function pickString(...candidates) {
   }
   return void 0;
 }
+function normalize(s) {
+  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w\s]/g, " ").replace(/\s+/g, " ").trim();
+}
+function crossCheckContext(result, ctx) {
+  if (!result.exists)
+    return { status: "n/a", expectedKeywords: [] };
+  const searchable = normalize([result.title, result.scope, result.fullSearchable].filter(Boolean).join(" "));
+  if (!searchable)
+    return { status: "n/a", expectedKeywords: [] };
+  let candidates = [];
+  if (result.type === "KALITEXT" || result.type === "LEGITEXT") {
+    if (ctx.branche)
+      candidates.push(normalize(ctx.branche));
+    if (ctx.idcc)
+      candidates.push(ctx.idcc.trim());
+  } else if (result.type === "LEGIARTI") {
+    if (ctx.code)
+      candidates.push(normalize(ctx.code));
+  } else if (result.type === "JURITEXT") {
+    if (ctx.juridiction)
+      candidates.push(normalize(ctx.juridiction));
+  } else if (result.type === "JORFTEXT") {
+    if (ctx.branche)
+      candidates.push(normalize(ctx.branche));
+  }
+  candidates = candidates.filter((c) => c.length > 0);
+  if (candidates.length === 0)
+    return { status: "n/a", expectedKeywords: [] };
+  const matched = candidates.some((c) => searchable.includes(c));
+  if (matched)
+    return { status: "match", expectedKeywords: candidates };
+  const branchHint = findBranchHint(result.fullSearchable);
+  const found = branchHint ? `r\xE9el rattachement d\xE9tect\xE9 : \xAB ${branchHint} \xBB` : `titre r\xE9el : \xAB ${(result.title ?? "").slice(0, 100)} \xBB`;
+  return {
+    status: "mismatch",
+    expectedKeywords: candidates,
+    detail: `attendu ${candidates.map((c) => `\xAB ${c} \xBB`).join(" ou ")}, ${found}`
+  };
+}
+function findBranchHint(fullSearchable) {
+  if (!fullSearchable)
+    return void 0;
+  const lower = fullSearchable.toLowerCase();
+  let idx = lower.indexOf("convention collective nationale");
+  if (idx < 0)
+    idx = lower.indexOf("convention collective");
+  if (idx < 0)
+    return void 0;
+  const chunk = fullSearchable.slice(idx, idx + 200).replace(/\s+/g, " ").trim();
+  return chunk;
+}
 function extractTitle(raw, type) {
   if (type === "JURITEXT") {
     return pickString(raw?.text?.titre, raw?.text?.titreLong, raw?.titre);
@@ -57430,6 +57481,19 @@ function extractScope(raw, type) {
   }
   if (type === "LEGIARTI" || type === "LEGITEXT") {
     return pickString(raw?.context?.titreTxt?.titre, raw?.article?.context?.titreTxt?.titre);
+  }
+  return void 0;
+}
+function extractSearchable(raw, type) {
+  if (type === "KALITEXT") {
+    const articles = raw?.articles;
+    if (Array.isArray(articles) && articles.length > 0) {
+      const parts = articles.map((a) => pickString(a?.content)).filter((s) => Boolean(s)).map((s) => s.replace(/<[^>]+>/g, " "));
+      const all = parts.join(" ").replace(/\s+/g, " ").trim();
+      if (all)
+        return all.length > 1e4 ? all.slice(0, 1e4) : all;
+    }
+    return void 0;
   }
   return void 0;
 }
@@ -57481,6 +57545,7 @@ async function validateRef(ref, http) {
       exists: true,
       title,
       scope: extractScope(raw, ref.type),
+      fullSearchable: extractSearchable(raw, ref.type),
       url: url2
     };
   } catch (err) {
@@ -57493,11 +57558,18 @@ function registerValidateNote(server, http) {
     title: "Valider toutes les r\xE9f\xE9rences L\xE9gifrance cit\xE9es dans une note",
     description: [
       "Extrait par regex tous les identifiants L\xE9gifrance (KALITEXT, LEGIARTI, LEGITEXT, JURITEXT, JORFTEXT, BOI-) cit\xE9s dans une note, et v\xE9rifie pour chacun (a) son existence c\xF4t\xE9 L\xE9gifrance, (b) son titre exact, (c) son champ d'application r\xE9el (branche pour KALI, juridiction pour JURI, code parent pour LEGIARTI).",
-      "\xC0 APPELER OBLIGATOIREMENT en fin de production de note ou de consultation, avant restitution \xE0 l'utilisateur. C'est le seul garde-fou non-LLM contre les hallucinations r\xE9siduelles : identifiants forg\xE9s (IDs qui n'existent pas) ET identifiants vrais mais rattach\xE9s \xE0 une autre branche que celle annonc\xE9e (\xAB pi\xE8ge des branches \xBB : un KALITEXT du bricolage cit\xE9 dans une note coiffure passe la v\xE9rif d'existence mais reste une hallucination).",
-      "Retourne un rapport markdown avec verdict par r\xE9f\xE9rence. Si une r\xE9f\xE9rence est invalide ou mal attribu\xE9e, l'agent doit la retirer ou la marquer \xAB \xE0 confirmer \xBB avant restitution finale."
+      "\xC0 APPELER OBLIGATOIREMENT en fin de production de note ou de consultation, avant restitution \xE0 l'utilisateur. C'est le seul garde-fou non-LLM contre les hallucinations r\xE9siduelles : identifiants forg\xE9s (IDs qui n'existent pas) ET identifiants vrais mais rattach\xE9s \xE0 une autre branche que celle annonc\xE9e (\xAB pi\xE8ge des branches \xBB).",
+      "IMPORTANT : passe TOUJOURS le param\xE8tre `expected_context` avec ce que la note pr\xE9tend couvrir (branche/idcc pour les CCN, code parent pour les articles, juridiction pour les arr\xEAts). Sans ce param\xE8tre, le tool ne peut pas d\xE9tecter automatiquement les r\xE9f\xE9rences mal attribu\xE9es \u2014 il se contente de lister, \xE0 charge pour toi de comparer. AVEC ce param\xE8tre, le tool fait le cross-check s\xE9mantique pour toi et te retourne une erreur explicite si une r\xE9f\xE9rence ne correspond pas.",
+      "Le tool retourne `isError: true` si au moins une r\xE9f\xE9rence est invalide ou mal attribu\xE9e \u2014 dans ce cas, tu DOIS corriger la note avant restitution."
     ].join("\n"),
     inputSchema: {
-      note: external_exports.string().min(1).describe("Texte complet de la note \xE0 valider, en markdown. Tu y passes la note finale telle que tu l'enverrais au lecteur.")
+      note: external_exports.string().min(1).describe("Texte complet de la note \xE0 valider, en markdown. Tu y passes la note finale telle que tu l'enverrais au lecteur."),
+      expected_context: external_exports.object({
+        branche: external_exports.string().optional().describe("Branche / CCN annonc\xE9e dans la note pour les KALITEXT (ex. \xAB coiffure \xBB, \xAB m\xE9tallurgie \xBB, \xAB b\xE2timent \xBB, \xAB distribution films \xBB). Recherch\xE9 en sous-cha\xEEne, insensible \xE0 la casse et aux accents."),
+        idcc: external_exports.string().optional().describe("IDCC \xE0 4 chiffres annonc\xE9 pour les KALITEXT (ex. \xAB 2596 \xBB pour la coiffure, \xAB 1090 \xBB pour le commerce automobile)."),
+        code: external_exports.string().optional().describe("Code parent annonc\xE9 pour les LEGIARTI (ex. \xAB Code du travail \xBB, \xAB Code de commerce \xBB, \xAB Code civil \xBB)."),
+        juridiction: external_exports.string().optional().describe("Juridiction annonc\xE9e pour les JURITEXT (ex. \xAB Cour de cassation, chambre sociale \xBB, \xAB Conseil d'\xC9tat \xBB, \xAB Cour d'appel \xBB).")
+      }).optional().describe("Contexte attendu de la note. Permet au tool de d\xE9tecter automatiquement les r\xE9f\xE9rences mal attribu\xE9es (pi\xE8ge des branches). \xC0 fournir syst\xE9matiquement.")
     }
   }, async (args) => {
     const refs = extractReferences(args.note);
@@ -57512,13 +57584,22 @@ function registerValidateNote(server, http) {
       };
     }
     log.info("validate-note: checking refs", { count: refs.length });
+    const ctx = args.expected_context ?? {};
+    const hasCtx = Object.values(ctx).some((v) => typeof v === "string" && v.trim().length > 0);
     const results = await Promise.all(refs.map((r) => validateRef(r, http)));
+    const crossChecks = results.map((r) => crossCheckContext(r, ctx));
     const ok = results.filter((r) => r.exists);
     const ko = results.filter((r) => !r.exists);
+    const mismatches = results.map((r, i) => ({ r, cc: crossChecks[i] })).filter(({ cc }) => cc.status === "mismatch");
+    const blocking = ko.length > 0 || mismatches.length > 0;
     const lines = [];
     lines.push(`# Validation de ${results.length} r\xE9f\xE9rence(s) L\xE9gifrance cit\xE9e(s)`);
     lines.push("");
-    lines.push(`**Synth\xE8se** : ${ok.length}/${results.length} r\xE9f\xE9rence(s) trouv\xE9e(s) c\xF4t\xE9 L\xE9gifrance, ${ko.length} \xE9chec(s) de v\xE9rification.`);
+    lines.push(`**Synth\xE8se** : ${ok.length}/${results.length} trouv\xE9e(s), ${ko.length} \xE9chec(s) de v\xE9rification, ${mismatches.length} mal attribu\xE9e(s) (pi\xE8ge des branches).`);
+    if (!hasCtx) {
+      lines.push("");
+      lines.push('\u26A0\uFE0F Tu n\'as pas pass\xE9 `expected_context` \u2014 le tool ne peut pas d\xE9tecter automatiquement les r\xE9f\xE9rences mal attribu\xE9es. Au prochain appel, passe `expected_context: { branche: "\u2026", idcc: "\u2026" }` (ou code/juridiction selon le cas) pour activer le cross-check anti pi\xE8ge-des-branches.');
+    }
     lines.push("");
     if (ko.length > 0) {
       lines.push("## \u26A0\uFE0F R\xE9f\xE9rences non v\xE9rifiables");
@@ -57530,29 +57611,73 @@ function registerValidateNote(server, http) {
       lines.push("");
       lines.push("**Action requise** : pour CHAQUE r\xE9f\xE9rence ci-dessus, soit tu la r\xE9cup\xE8res maintenant via le bon `legifrance_get_*` tool (et tu mets \xE0 jour ta note avec le titre exact), soit tu la retires de ta note et tu la remplaces par \xAB \xE0 confirmer (r\xE9f\xE9rence non v\xE9rifi\xE9e) \xBB. **Une r\xE9f\xE9rence non v\xE9rifi\xE9e ne doit jamais \xEAtre livr\xE9e au lecteur.**");
       lines.push("");
-      lines.push("Si toutes les v\xE9rifications \xE9chouent (HTTP 400, 503\u2026), c'est probablement un hoquet PISTE temporaire : retente dans 30 secondes ou ajoute un disclaimer fort en t\xEAte de note.");
-      lines.push("");
     }
-    if (ok.length > 0) {
-      lines.push("## \u2713 R\xE9f\xE9rences confirm\xE9es existantes");
+    if (mismatches.length > 0) {
+      lines.push("## \u{1F6A8} PI\xC8GE DES BRANCHES D\xC9TECT\xC9 \u2014 r\xE9f\xE9rences mal attribu\xE9es");
       lines.push("");
-      for (const r of ok) {
-        lines.push(`- \`${r.id}\` (${r.type})`);
+      for (const { r, cc } of mismatches) {
+        lines.push(`- \`${r.id}\` (${r.type}) \u2014 **MISMATCH**`);
         if (r.title)
           lines.push(`  - Titre r\xE9el : **${r.title}**`);
         if (r.scope)
-          lines.push(`  - Rattachement / contexte : ${r.scope}`);
+          lines.push(`  - Rattachement r\xE9el : ${r.scope}`);
+        if (cc.detail)
+          lines.push(`  - ${cc.detail}`);
         lines.push(`  - URL : ${r.url}`);
       }
       lines.push("");
-      lines.push("**Action requise \u2014 pi\xE8ge des branches** : pour CHAQUE KALITEXT confirm\xE9 ci-dessus, v\xE9rifie que le titre r\xE9el correspond bien \xE0 la branche (CCN/IDCC) que tu annonces dans ta note. Idem pour les LEGIARTI : le code parent r\xE9el doit correspondre au code annonc\xE9. Un identifiant valide mais mal attribu\xE9 (avenant du bricolage cit\xE9 dans une note coiffure) reste une hallucination et discr\xE9dite ta note.");
-      lines.push("");
-      lines.push("Si un titre r\xE9el ne correspond pas \xE0 ce que tu annon\xE7ais, tu DOIS : retirer la r\xE9f\xE9rence, ou la remplacer par la bonne r\xE9f\xE9rence (relance `legifrance_recherche` cibl\xE9e sur la bonne branche), ou marquer explicitement \xAB \xE0 confirmer \xBB.");
+      lines.push("**Action OBLIGATOIRE** : ces r\xE9f\xE9rences ne correspondent PAS au contexte annonc\xE9. Retire-les de ta note et remplace-les soit par la bonne r\xE9f\xE9rence (relance `legifrance_recherche` cibl\xE9e sur la vraie branche/code/juridiction), soit par \xAB \xE0 confirmer (r\xE9f\xE9rence non v\xE9rifi\xE9e) \xBB. **Ne livre PAS la note en l'\xE9tat au lecteur.**");
       lines.push("");
     }
+    if (ok.length > 0) {
+      const zipped = results.map((r, i) => ({ r, cc: crossChecks[i] })).filter(({ r }) => r.exists);
+      const matches = zipped.filter(({ cc }) => cc.status === "match").map(({ r }) => r);
+      const naList = zipped.filter(({ cc }) => cc.status === "n/a").map(({ r }) => r);
+      if (matches.length > 0) {
+        lines.push("## \u2713 R\xE9f\xE9rences confirm\xE9es et bien attribu\xE9es");
+        lines.push("");
+        for (const r of matches) {
+          lines.push(`- \`${r.id}\` (${r.type})`);
+          if (r.title)
+            lines.push(`  - Titre r\xE9el : **${r.title}**`);
+          if (r.scope)
+            lines.push(`  - Rattachement : ${r.scope}`);
+          lines.push(`  - URL : ${r.url}`);
+        }
+        lines.push("");
+      }
+      if (naList.length > 0) {
+        lines.push("## \u2139\uFE0F R\xE9f\xE9rences confirm\xE9es (rattachement non cross-check\xE9)");
+        lines.push("");
+        for (const r of naList) {
+          lines.push(`- \`${r.id}\` (${r.type})`);
+          if (r.title)
+            lines.push(`  - Titre r\xE9el : **${r.title}**`);
+          if (r.scope)
+            lines.push(`  - Rattachement : ${r.scope}`);
+          lines.push(`  - URL : ${r.url}`);
+        }
+        lines.push("");
+        if (hasCtx) {
+          lines.push("*(Rattachement non cross-check\xE9 : type de r\xE9f\xE9rence non couvert par le contexte fourni, ou scope manquant.)*");
+        } else {
+          lines.push("*(Rattachement non cross-check\xE9 : aucun `expected_context` fourni. Lis chaque titre r\xE9el ci-dessus et compare-le \xE0 ce que ta note annonce.)*");
+        }
+        lines.push("");
+      }
+    }
     lines.push("---");
-    lines.push("*Ce tool v\xE9rifie l'existence et le rattachement des identifiants. Il ne v\xE9rifie pas que tu as cit\xE9 le bon identifiant pour r\xE9pondre \xE0 la question initiale. Le cross-check s\xE9mantique final reste \xE0 ta charge.*");
-    return { content: [{ type: "text", text: lines.join("\n") }] };
+    if (blocking) {
+      lines.push("**\u274C La note ne passe pas la validation.** Corrige les r\xE9f\xE9rences flagu\xE9es ci-dessus, puis r\xE9-appelle `validate_note` pour confirmer.");
+    } else if (hasCtx) {
+      lines.push("**\u2705 La note passe la validation** : toutes les r\xE9f\xE9rences cit\xE9es existent et correspondent au contexte annonc\xE9.");
+    } else {
+      lines.push("*Toutes les r\xE9f\xE9rences cit\xE9es existent. Le cross-check s\xE9mantique n'a pas \xE9t\xE9 effectu\xE9 (pas de `expected_context`). Compare manuellement chaque titre r\xE9el \xE0 ce que ta note annonce avant restitution.*");
+    }
+    return {
+      isError: blocking,
+      content: [{ type: "text", text: lines.join("\n") }]
+    };
   });
 }
 

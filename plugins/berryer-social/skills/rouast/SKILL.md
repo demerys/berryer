@@ -136,15 +136,30 @@ Si l'agent ne peut pas vérifier (API en panne, ID rejeté, recherche infructueu
 
 ## Étape 4 — Self-check final (obligatoire avant envoi)
 
-### 4.a — Appel obligatoire de `validate_note`
+### 4.a — Appel obligatoire de `validate_note` AVEC `expected_context`
 
-**Avant toute relecture humaine, tu DOIS appeler le tool `validate_note` avec ta note finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités (KALITEXT, LEGIARTI, JURITEXT, JORFTEXT…) et vérifie pour chacun (a) son existence, (b) son titre exact, (c) son **champ d'application réel** — c'est cette dernière vérification qui rattrape le piège des branches (un KALITEXT du bricolage cité dans une note coiffure passe la vérif d'existence mais reste une hallucination grave).
+**Avant toute relecture humaine, tu DOIS appeler `validate_note` avec ta note finale ET le paramètre `expected_context`** qui dit ce que la note prétend couvrir. Format :
 
-Tu traites la réponse :
+```
+validate_note({
+  note: "<ta note finale en markdown>",
+  expected_context: {
+    branche: "coiffure",         // ou "métallurgie", "bâtiment"…
+    idcc: "2596",                 // l'IDCC à 4 chiffres annoncé
+    code: "Code du travail"       // si la note cite des articles
+  }
+})
+```
+
+**Sans `expected_context`, le tool ne peut pas détecter automatiquement le piège des branches** — il liste seulement les références, à toi de comparer (et c'est précisément ce que le LLM rate). Avec `expected_context`, le tool fait le cross-check pour toi et te retourne une erreur explicite si une référence ne correspond pas.
+
+**Le tool retourne `isError: true` si au moins une référence est invalide OU mal attribuée.** Dans ce cas, tu DOIS corriger la note avant restitution. Pas de discussion possible :
 
 - **Référence non vérifiable** → retirée ou remplacée par « à confirmer (référence non vérifiée) ».
-- **Référence valide mais mal attribuée** (KALITEXT d'une autre CCN que celle annoncée, LEGIARTI d'un autre code que celui annoncé) → retirée et remplacée par la bonne référence trouvée via `legifrance_recherche fond=KALI` (ou autre) ciblée sur la vraie branche, ou par « à confirmer ».
+- **🚨 PIÈGE DES BRANCHES DÉTECTÉ** (KALITEXT d'une autre CCN que celle annoncée) → retirée et remplacée par la bonne référence trouvée via `legifrance_recherche fond=KALI` ciblée sur la vraie branche, ou par « à confirmer ».
 - **Référence valide et bien attribuée** → conservée.
+
+Ré-appelle `validate_note` après correction pour confirmer que tout passe (`isError: false`).
 
 ### 4.b — Revue manuelle complémentaire
 

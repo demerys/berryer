@@ -18,17 +18,29 @@ Tu produis une **grille de risque** structurée sur une opération en cours de n
 > 2. **Lire le titre du texte cible** et vérifier qu'il correspond à la situation visée. Un identifiant Légifrance valide peut renvoyer à un texte d'une autre matière que celle annoncée — le titre seul fait foi.
 > 3. **Confirmer la version en vigueur** à la date de l'opération (les seuils, les conditions d'exonération et la jurisprudence évoluent).
 
-## Self-check final obligatoire — appel de `validate_note`
+## Self-check final obligatoire — appel de `validate_note` AVEC `expected_context`
 
-**Avant de remettre la grille de risque au lecteur, tu DOIS appeler le tool `validate_note` avec ta note finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités (LEGIARTI, JURITEXT, JORFTEXT, etc.) et vérifie pour chacun (a) son existence, (b) son titre, (c) son rattachement réel (code parent, juridiction…).
+**Avant de remettre la grille de risque au lecteur, tu DOIS appeler `validate_note` avec ta note finale ET le paramètre `expected_context`** qui dit ce que la note prétend couvrir. Format :
 
-Tu traites la réponse :
+```
+validate_note({
+  note: "<ta note finale en markdown>",
+  expected_context: {
+    code: "Code de commerce",     // ou "Code civil", "Code monétaire et financier"…
+    juridiction: "Cour de cassation, chambre commerciale"  // si arrêts cités
+  }
+})
+```
 
-- **Référence non vérifiable** → tu la retires de la grille ou tu la remplaces par « à confirmer (référence non vérifiée) ».
-- **Référence valide mais mal attribuée** (LEGIARTI d'un autre code, JURITEXT d'une autre matière) → tu la retires et tu cherches la bonne via `legifrance_recherche`, ou tu la remplaces par « à confirmer ».
+**Sans `expected_context`, pas de cross-check sémantique** — le tool se contente de lister. Avec `expected_context`, il retourne `isError: true` si un LEGIARTI cité comme « art. L. 225-x C. com. » appartient en réalité au Code civil (ou inversement), ou si un arrêt « Cass. com. » cité est en fait un Cass. soc.
+
+Tu traites les flags :
+
+- **Référence non vérifiable** → retirée de la grille ou remplacée par « à confirmer (référence non vérifiée) ».
+- **🚨 PIÈGE DES BRANCHES DÉTECTÉ** → retirée et remplacée via `legifrance_recherche` ciblée sur le bon code/la bonne juridiction, ou par « à confirmer ».
 - **Référence valide et bien attribuée** → conservée.
 
-Étape non négociable. La grille de risque transactionnel est lue avant un signing — une référence inventée à un article du Code de commerce qui n'existe pas peut conduire à une mauvaise décision contractuelle. Le garde-fou `validate_note` est le filet final, non-LLM.
+Étape non négociable. La grille de risque transactionnel est lue avant un signing — une référence inventée ou mal attribuée à un article du Code de commerce peut conduire à une mauvaise décision contractuelle. Ré-appelle après correction jusqu'à `isError: false`.
 
 ## Structure obligatoire
 

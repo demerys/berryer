@@ -47,7 +47,8 @@ for plugin in "${PLUGINS[@]}"; do
   echo "════════════════════════════════════════════"
 
   # 2. Bundle le serveur MCP avec esbuild (inline @berryer/core et toutes les
-  #    deps JS, externalize seulement better-sqlite3 qui est natif)
+  #    deps JS — plus de dépendance native depuis le passage du cache à un
+  #    store JSON pur Node)
   echo "▶ Bundle esbuild…"
   npx esbuild "$PLUGIN_DIR/mcp-server/src/index.ts" \
     --bundle \
@@ -55,7 +56,6 @@ for plugin in "${PLUGINS[@]}"; do
     --target=node20 \
     --format=esm \
     --outfile="$PLUGIN_DIR/mcp-server/dist/index.js" \
-    --external:better-sqlite3 \
     --banner:js='import { createRequire } from "module"; const require = createRequire(import.meta.url);' \
     --log-level=warning
 
@@ -75,32 +75,8 @@ for plugin in "${PLUGINS[@]}"; do
     --exclude='mcp-server/src/' \
     "$PLUGIN_DIR/" "$STAGE/"
 
-  # 5. Copier better-sqlite3 (et ses deps natives) dans node_modules du plugin.
-  #    npm workspaces hoist différemment selon la version : on cherche
-  #    better-sqlite3 dans plusieurs emplacements possibles.
-  echo "▶ Copie de better-sqlite3 (binding natif)…"
-  mkdir -p "$STAGE/mcp-server/node_modules"
-  BSQ_SRC=""
-  for candidate in node_modules/better-sqlite3 packages/core/node_modules/better-sqlite3; do
-    if [[ -d "$candidate" ]]; then
-      BSQ_SRC="$candidate"
-      break
-    fi
-  done
-  if [[ -z "$BSQ_SRC" ]]; then
-    echo "❌ better-sqlite3 introuvable. Lance npm install d'abord." >&2
-    exit 1
-  fi
-  rsync -a "$BSQ_SRC" "$STAGE/mcp-server/node_modules/"
-  # better-sqlite3 dépend de bindings et file-uri-to-path
-  for dep in bindings file-uri-to-path; do
-    for cand in "node_modules/$dep" "packages/core/node_modules/$dep"; do
-      if [[ -d "$cand" ]]; then
-        rsync -a "$cand" "$STAGE/mcp-server/node_modules/"
-        break
-      fi
-    done
-  done
+  # 5. Plus de dépendance native à copier — le cache est entièrement géré
+  #    via fs natif Node (packages/core/src/cache.ts).
 
   # 6. Créer un README_BETA dans le zip
   cat > "$STAGE/README_BETA.md" <<EOF

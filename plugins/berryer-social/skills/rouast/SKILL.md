@@ -7,6 +7,17 @@ description: Méthodologie en 3 étapes pour le contentieux et les opérations e
 
 Tu produis des notes en droit social qui sont **directement utilisables** par un avocat prud'homaliste. La méthode tient en 3 étapes obligatoires.
 
+## En-tête obligatoire de TOUTE note sociale
+
+**Chaque note produite doit commencer par ce bandeau, sans exception.** Y compris pour les identifications simples de CCN. Il protège le lecteur contre les hallucinations résiduelles qu'aucun prompt n'empêche totalement.
+
+> **⚠️ Note de recherche sociale — vérification finale par le professionnel**
+>
+> Cette note s'appuie sur les sources officielles consultées via l'API Légifrance (codes, fond KALI, jurisprudence Cass. soc.). Avant tout usage opérationnel — bulletin de paie, lettre de licenciement, négociation, dossier prud'homal — :
+> 1. **Cliquer sur chaque lien Légifrance** cité pour ouvrir le texte source.
+> 2. **Lire le titre du texte cible** et vérifier qu'il correspond bien à la **convention collective annoncée** (l'IDCC indiqué, par exemple coiffure IDCC 2596). Un KALITEXT valide peut renvoyer à un texte d'une CCN voisine (bricolage, tourisme social, esthétique…) — le titre seul fait foi.
+> 3. **Confirmer la version en vigueur** à la date d'application visée. Les avenants salaires sont revalorisés 1 à 2 fois par an dans la plupart des branches.
+
 ## Étape 1 — Détermination de la CCN applicable
 
 C'est l'erreur la plus fréquente : se tromper de CCN. Sans cette étape, l'analyse est incomplète.
@@ -125,12 +136,21 @@ Si l'agent ne peut pas vérifier (API en panne, ID rejeté, recherche infructueu
 
 ## Étape 4 — Self-check final (obligatoire avant envoi)
 
-Avant de remettre la note, **passe en revue chaque identifiant cité** (KALITEXT, LEGIARTI, JURITEXT, JORFTEXT, IDCC, n° d'avenant, date d'arrêté d'extension, coefficient de classification) et identifie l'appel de tool qui te l'a fourni. Si tu ne peux pas pointer l'appel pour une référence donnée, deux options :
+### 4.a — Appel obligatoire de `validate_note`
 
-1. relancer le tool maintenant pour vérifier (`legifrance_get_loda` si tu as un KALITEXT, `legifrance_recherche` sinon) ;
-2. remplacer la citation par **« à confirmer (référence non vérifiée) »** et le signaler explicitement dans la note.
+**Avant toute relecture humaine, tu DOIS appeler le tool `validate_note` avec ta note finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités (KALITEXT, LEGIARTI, JURITEXT, JORFTEXT…) et vérifie pour chacun (a) son existence, (b) son titre exact, (c) son **champ d'application réel** — c'est cette dernière vérification qui rattrape le piège des branches (un KALITEXT du bricolage cité dans une note coiffure passe la vérif d'existence mais reste une hallucination grave).
 
-Pas d'autre option. Une référence inventée — même très plausible — engage la responsabilité du professionnel utilisateur et discrédite le plugin.
+Tu traites la réponse :
+
+- **Référence non vérifiable** → retirée ou remplacée par « à confirmer (référence non vérifiée) ».
+- **Référence valide mais mal attribuée** (KALITEXT d'une autre CCN que celle annoncée, LEGIARTI d'un autre code que celui annoncé) → retirée et remplacée par la bonne référence trouvée via `legifrance_recherche fond=KALI` (ou autre) ciblée sur la vraie branche, ou par « à confirmer ».
+- **Référence valide et bien attribuée** → conservée.
+
+### 4.b — Revue manuelle complémentaire
+
+En complément de `validate_note`, **passe en revue chaque identifiant cité** et identifie l'appel de tool qui te l'a fourni. Si tu ne peux pas pointer l'appel, retire ou marque « à confirmer ».
+
+Une référence inventée — ou attribuée à la mauvaise branche — engage la responsabilité du professionnel utilisateur et discrédite le plugin. Le bandeau d'en-tête de la note rappelle au lecteur d'ouvrir les liens, mais c'est ton self-check qui doit le rendre rare.
 
 ## Format de sortie
 

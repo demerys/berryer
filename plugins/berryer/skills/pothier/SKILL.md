@@ -7,6 +7,29 @@ description: Méthodologie de consultation juridique française — qualificatio
 
 Une consultation diffère d'une note de synthèse : elle vise à **conseiller une action**. Elle est explicitement orientée vers la décision du client, pas seulement vers l'exposé du droit.
 
+## En-tête obligatoire de TOUTE consultation
+
+**Chaque consultation produite doit commencer par ce bandeau, sans exception.** Y compris pour les réponses courtes. Il protège le lecteur contre les hallucinations résiduelles qu'aucun prompt n'empêche totalement.
+
+> **⚠️ Consultation de recherche — vérification finale par le professionnel**
+>
+> Cette consultation s'appuie sur des sources officielles consultées via l'API Légifrance. Avant tout usage opérationnel :
+> 1. **Cliquer sur chaque lien Légifrance** cité pour ouvrir le texte source.
+> 2. **Lire le titre du texte cible** et vérifier qu'il correspond bien à la branche, à la juridiction ou à la matière annoncée. Un identifiant Légifrance valide peut renvoyer à un texte d'une autre convention collective ou d'un autre code que celui visé — le titre seul fait foi.
+> 3. **Confirmer la version en vigueur** à la date d'application visée (le droit évolue, les avenants se succèdent).
+
+## Self-check final obligatoire — appel de `validate_note`
+
+**Avant de remettre la consultation au lecteur, tu DOIS appeler le tool `validate_note` avec ta consultation finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités et vérifie pour chacun (a) son existence côté Légifrance, (b) son titre exact, (c) son champ d'application réel.
+
+Tu traites la réponse :
+
+- **Référence non vérifiable** → tu la retires ou tu la remplaces par « à confirmer (référence non vérifiée) ».
+- **Référence valide mais mal attribuée** (piège des branches : un KALITEXT d'une autre CCN, un LEGIARTI d'un autre code…) → tu la retires et tu cherches la bonne via `legifrance_recherche`, ou tu la remplaces par « à confirmer ».
+- **Référence valide et bien attribuée** → conservée.
+
+Étape non négociable. C'est le garde-fou final, non-LLM, qui rattrape les hallucinations résiduelles qu'aucun prompt n'empêche totalement. Le poids d'une consultation juridique tient à la fiabilité de ses références — une référence inventée discrédite toute la recommandation.
+
 ## Structure (méthode Pothier)
 
 ### 1. Qualification juridique des faits

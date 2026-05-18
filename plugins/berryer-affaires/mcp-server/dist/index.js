@@ -1877,7 +1877,7 @@ var require_keyword = __commonJS({
       const { gen, keyword, schema, parentSchema, $data, it } = cxt;
       checkAsyncKeyword(it, def);
       const validate = !$data && def.compile ? def.compile.call(it.self, schema, parentSchema, it) : def.validate;
-      const validateRef = useKeyword(gen, keyword, validate);
+      const validateRef2 = useKeyword(gen, keyword, validate);
       const valid = gen.let("valid");
       cxt.block$data(valid, validateKeyword);
       cxt.ok((_a3 = def.valid) !== null && _a3 !== void 0 ? _a3 : valid);
@@ -1900,7 +1900,7 @@ var require_keyword = __commonJS({
         return ruleErrs;
       }
       function validateSync() {
-        const validateErrs = (0, codegen_1._)`${validateRef}.errors`;
+        const validateErrs = (0, codegen_1._)`${validateRef2}.errors`;
         gen.assign(validateErrs, null);
         assignValid(codegen_1.nil);
         return validateErrs;
@@ -1908,7 +1908,7 @@ var require_keyword = __commonJS({
       function assignValid(_await = def.async ? (0, codegen_1._)`await ` : codegen_1.nil) {
         const passCxt = it.opts.passContext ? names_1.default.this : names_1.default.self;
         const passSchema = !("compile" in def && !$data || def.schema === false);
-        gen.assign(valid, (0, codegen_1._)`${_await}${(0, code_1.callValidateCode)(cxt, validateRef, passCxt, passSchema)}`, def.modifying);
+        gen.assign(valid, (0, codegen_1._)`${_await}${(0, code_1.callValidateCode)(cxt, validateRef2, passCxt, passSchema)}`, def.modifying);
       }
       function reportErrs(errors) {
         var _a4;
@@ -57351,6 +57351,188 @@ function registerCacheClear(server, cache) {
   });
 }
 
+// packages/core/dist/tools/validate-note.js
+var ID_PATTERNS = [
+  ["KALITEXT", /KALITEXT\d{8,14}/g],
+  ["LEGIARTI", /LEGIARTI\d{8,14}/g],
+  ["LEGITEXT", /LEGITEXT\d{8,14}/g],
+  ["JURITEXT", /JURITEXT\d{8,14}/g],
+  ["JORFTEXT", /JORFTEXT\d{8,14}/g],
+  ["BOI", /\bBOI-[A-Z]{2,5}(?:-[A-Z0-9]{1,5}){1,6}\b/g]
+];
+function extractReferences(note) {
+  const matches = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const [type, regex] of ID_PATTERNS) {
+    regex.lastIndex = 0;
+    let m;
+    while ((m = regex.exec(note)) !== null) {
+      const id = m[0];
+      const key = `${type}:${id}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        matches.push({ type, id });
+      }
+    }
+  }
+  return matches;
+}
+function urlFor(ref) {
+  switch (ref.type) {
+    case "KALITEXT":
+      return `https://www.legifrance.gouv.fr/conv_coll/id/${ref.id}/`;
+    case "LEGITEXT":
+      return `https://www.legifrance.gouv.fr/loda/id/${ref.id}/`;
+    case "JORFTEXT":
+      return `https://www.legifrance.gouv.fr/jorf/id/${ref.id}/`;
+    case "LEGIARTI":
+      return `https://www.legifrance.gouv.fr/codes/article_lc/${ref.id}/`;
+    case "JURITEXT":
+      return `https://www.legifrance.gouv.fr/juri/id/${ref.id}/`;
+    case "BOI":
+      return `https://www.legifrance.gouv.fr/circulaire/id/${ref.id}/`;
+  }
+}
+function pickString(...candidates) {
+  for (const c of candidates) {
+    if (typeof c === "string" && c.trim().length > 0)
+      return c.trim();
+  }
+  return void 0;
+}
+function extractTitle(raw, type) {
+  if (type === "JURITEXT") {
+    return pickString(raw?.text?.titre, raw?.text?.titreLong, raw?.titre);
+  }
+  return pickString(raw?.title, raw?.titre, raw?.titreLong, raw?.text?.titre, raw?.text?.titreLong, raw?.article?.titre);
+}
+function extractScope(raw, type) {
+  if (type === "KALITEXT") {
+    return pickString(raw?.contexte?.text?.titre, raw?.contexte?.text?.titreLong, raw?.contexte?.titre, raw?.cidTexte, raw?.parent?.titre);
+  }
+  if (type === "JURITEXT") {
+    const j = pickString(raw?.text?.juridiction);
+    const formation = pickString(raw?.text?.formation);
+    return [j, formation].filter(Boolean).join(" \xB7 ") || void 0;
+  }
+  if (type === "LEGIARTI" || type === "LEGITEXT") {
+    return pickString(raw?.context?.titreTxt?.titre, raw?.article?.context?.titreTxt?.titre);
+  }
+  return void 0;
+}
+async function validateRef(ref, http) {
+  const url2 = urlFor(ref);
+  let path;
+  let body;
+  switch (ref.type) {
+    case "KALITEXT":
+    case "LEGITEXT":
+    case "JORFTEXT":
+      path = "/consult/lawDecree";
+      body = { textId: ref.id };
+      break;
+    case "LEGIARTI":
+      path = "/consult/getArticle";
+      body = { id: ref.id };
+      break;
+    case "JURITEXT":
+      path = "/consult/juri";
+      body = { textId: ref.id };
+      break;
+    case "BOI":
+      path = "/consult/jorfPart";
+      body = { searchedString: ref.id };
+      break;
+  }
+  try {
+    const raw = await http.post(path, body);
+    if (!raw || typeof raw === "object" && Object.keys(raw).length === 0) {
+      return { id: ref.id, type: ref.type, exists: false, url: url2, error: "r\xE9ponse vide" };
+    }
+    if (ref.type === "JURITEXT" && !raw?.text) {
+      return { id: ref.id, type: ref.type, exists: false, url: url2, error: "d\xE9cision introuvable" };
+    }
+    return {
+      id: ref.id,
+      type: ref.type,
+      exists: true,
+      title: extractTitle(raw, ref.type),
+      scope: extractScope(raw, ref.type),
+      url: url2
+    };
+  } catch (err) {
+    const msg = err?.message ? String(err.message) : String(err);
+    return { id: ref.id, type: ref.type, exists: false, url: url2, error: msg.slice(0, 240) };
+  }
+}
+function registerValidateNote(server, http) {
+  server.registerTool("validate_note", {
+    title: "Valider toutes les r\xE9f\xE9rences L\xE9gifrance cit\xE9es dans une note",
+    description: [
+      "Extrait par regex tous les identifiants L\xE9gifrance (KALITEXT, LEGIARTI, LEGITEXT, JURITEXT, JORFTEXT, BOI-) cit\xE9s dans une note, et v\xE9rifie pour chacun (a) son existence c\xF4t\xE9 L\xE9gifrance, (b) son titre exact, (c) son champ d'application r\xE9el (branche pour KALI, juridiction pour JURI, code parent pour LEGIARTI).",
+      "\xC0 APPELER OBLIGATOIREMENT en fin de production de note ou de consultation, avant restitution \xE0 l'utilisateur. C'est le seul garde-fou non-LLM contre les hallucinations r\xE9siduelles : identifiants forg\xE9s (IDs qui n'existent pas) ET identifiants vrais mais rattach\xE9s \xE0 une autre branche que celle annonc\xE9e (\xAB pi\xE8ge des branches \xBB : un KALITEXT du bricolage cit\xE9 dans une note coiffure passe la v\xE9rif d'existence mais reste une hallucination).",
+      "Retourne un rapport markdown avec verdict par r\xE9f\xE9rence. Si une r\xE9f\xE9rence est invalide ou mal attribu\xE9e, l'agent doit la retirer ou la marquer \xAB \xE0 confirmer \xBB avant restitution finale."
+    ].join("\n"),
+    inputSchema: {
+      note: external_exports.string().min(1).describe("Texte complet de la note \xE0 valider, en markdown. Tu y passes la note finale telle que tu l'enverrais au lecteur.")
+    }
+  }, async (args) => {
+    const refs = extractReferences(args.note);
+    if (refs.length === 0) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Aucun identifiant L\xE9gifrance d\xE9tect\xE9 (KALITEXT/LEGIARTI/LEGITEXT/JURITEXT/JORFTEXT/BOI-). Si ta note contient des citations sans aucun de ces IDs, le format impos\xE9 (cf. skill geny) n'est pas respect\xE9 \u2014 chaque date d'acte juridique doit \xEAtre suivie de son identifiant entre parenth\xE8ses. R\xE9\xE9cris la note avec les IDs, ou marque explicitement les r\xE9f\xE9rences non v\xE9rifi\xE9es \xAB \xE0 confirmer \xBB."
+          }
+        ]
+      };
+    }
+    log.info("validate-note: checking refs", { count: refs.length });
+    const results = await Promise.all(refs.map((r) => validateRef(r, http)));
+    const ok = results.filter((r) => r.exists);
+    const ko = results.filter((r) => !r.exists);
+    const lines = [];
+    lines.push(`# Validation de ${results.length} r\xE9f\xE9rence(s) L\xE9gifrance cit\xE9e(s)`);
+    lines.push("");
+    lines.push(`**Synth\xE8se** : ${ok.length}/${results.length} r\xE9f\xE9rence(s) trouv\xE9e(s) c\xF4t\xE9 L\xE9gifrance, ${ko.length} \xE9chec(s) de v\xE9rification.`);
+    lines.push("");
+    if (ko.length > 0) {
+      lines.push("## \u26A0\uFE0F R\xE9f\xE9rences non v\xE9rifiables");
+      lines.push("");
+      for (const r of ko) {
+        lines.push(`- \`${r.id}\` (${r.type}) \u2014 **${r.error ?? "v\xE9rification impossible"}**`);
+        lines.push(`  - URL tent\xE9e : ${r.url}`);
+      }
+      lines.push("");
+      lines.push("**Action requise** : pour CHAQUE r\xE9f\xE9rence ci-dessus, soit tu la r\xE9cup\xE8res maintenant via le bon `legifrance_get_*` tool (et tu mets \xE0 jour ta note avec le titre exact), soit tu la retires de ta note et tu la remplaces par \xAB \xE0 confirmer (r\xE9f\xE9rence non v\xE9rifi\xE9e) \xBB. **Une r\xE9f\xE9rence non v\xE9rifi\xE9e ne doit jamais \xEAtre livr\xE9e au lecteur.**");
+      lines.push("");
+      lines.push("Si toutes les v\xE9rifications \xE9chouent (HTTP 400, 503\u2026), c'est probablement un hoquet PISTE temporaire : retente dans 30 secondes ou ajoute un disclaimer fort en t\xEAte de note.");
+      lines.push("");
+    }
+    if (ok.length > 0) {
+      lines.push("## \u2713 R\xE9f\xE9rences confirm\xE9es existantes");
+      lines.push("");
+      for (const r of ok) {
+        lines.push(`- \`${r.id}\` (${r.type})`);
+        if (r.title)
+          lines.push(`  - Titre r\xE9el : **${r.title}**`);
+        if (r.scope)
+          lines.push(`  - Rattachement / contexte : ${r.scope}`);
+        lines.push(`  - URL : ${r.url}`);
+      }
+      lines.push("");
+      lines.push("**Action requise \u2014 pi\xE8ge des branches** : pour CHAQUE KALITEXT confirm\xE9 ci-dessus, v\xE9rifie que le titre r\xE9el correspond bien \xE0 la branche (CCN/IDCC) que tu annonces dans ta note. Idem pour les LEGIARTI : le code parent r\xE9el doit correspondre au code annonc\xE9. Un identifiant valide mais mal attribu\xE9 (avenant du bricolage cit\xE9 dans une note coiffure) reste une hallucination et discr\xE9dite ta note.");
+      lines.push("");
+      lines.push("Si un titre r\xE9el ne correspond pas \xE0 ce que tu annon\xE7ais, tu DOIS : retirer la r\xE9f\xE9rence, ou la remplacer par la bonne r\xE9f\xE9rence (relance `legifrance_recherche` cibl\xE9e sur la bonne branche), ou marquer explicitement \xAB \xE0 confirmer \xBB.");
+      lines.push("");
+    }
+    lines.push("---");
+    lines.push("*Ce tool v\xE9rifie l'existence et le rattachement des identifiants. Il ne v\xE9rifie pas que tu as cit\xE9 le bon identifiant pour r\xE9pondre \xE0 la question initiale. Le cross-check s\xE9mantique final reste \xE0 ta charge.*");
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  });
+}
+
 // packages/core/dist/index.js
 function createBerryerServer(opts) {
   const config2 = loadConfig();
@@ -57369,6 +57551,7 @@ function createBerryerServer(opts) {
   registerRecherche(server, http);
   registerSuggest(server, http);
   registerCacheClear(server, cache);
+  registerValidateNote(server, http);
   const start2 = async () => {
     const transport = new StdioServerTransport();
     await server.connect(transport);

@@ -7,6 +7,29 @@ description: Méthodologie de rédaction d'une note de synthèse juridique confo
 
 Tu rédiges une note de synthèse juridique selon la méthode classique française. Une note bien faite doit être lisible par un client en 5 minutes et par un confrère en 30 secondes (sommaire + chapeau).
 
+## En-tête obligatoire de TOUTE note
+
+**Chaque note produite doit commencer par ce bandeau, sans exception.** Y compris pour les réponses courtes. Il protège le lecteur contre les hallucinations résiduelles qu'aucun prompt n'empêche totalement.
+
+> **⚠️ Note de recherche — vérification finale par le professionnel**
+>
+> Cette note s'appuie sur des sources officielles consultées via l'API Légifrance. Avant tout usage opérationnel :
+> 1. **Cliquer sur chaque lien Légifrance** cité pour ouvrir le texte source.
+> 2. **Lire le titre du texte cible** et vérifier qu'il correspond bien à la branche, à la juridiction ou à la matière annoncée dans la note. Un identifiant Légifrance valide peut renvoyer à un texte d'une autre convention collective ou d'un autre code que celui visé — le titre seul fait foi.
+> 3. **Confirmer la version en vigueur** à la date d'application visée (le droit évolue, les avenants se succèdent).
+
+## Self-check final obligatoire — appel de `validate_note`
+
+**Avant de remettre la note au lecteur, tu DOIS appeler le tool `validate_note` avec ta note finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités et vérifie pour chacun (a) son existence côté Légifrance, (b) son titre exact, (c) son champ d'application réel (code parent pour LEGIARTI, branche pour KALI, juridiction pour JURI).
+
+Tu traites la réponse :
+
+- **Référence non vérifiable** → tu la retires de la note ou tu la remplaces par « à confirmer (référence non vérifiée) ».
+- **Référence valide mais mal attribuée** (piège des branches : un KALITEXT du bricolage cité dans une note coiffure, un LEGIARTI du Code civil cité comme article du Code de commerce…) → tu la retires et tu cherches la bonne via `legifrance_recherche` ciblée, ou tu la remplaces par « à confirmer ».
+- **Référence valide et bien attribuée** → conservée.
+
+Cette étape est non négociable. C'est le garde-fou final, non-LLM, qui rattrape les hallucinations résiduelles qu'aucun prompt n'empêche totalement.
+
 ## Structure obligatoire (dans cet ordre)
 
 ### 1. Faits qualifiés (5–10 lignes)

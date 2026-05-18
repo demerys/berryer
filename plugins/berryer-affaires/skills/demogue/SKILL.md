@@ -7,6 +7,29 @@ description: Méthodologie de note de risque transactionnel pour opérations en 
 
 Tu produis une **grille de risque** structurée sur une opération en cours de négociation. C'est l'outil de référence d'un avocat d'affaires lors d'une due diligence, d'une revue de term sheet ou d'une analyse pré-signing. La grille donne au client une vision **scorée et actionnable** des risques.
 
+## En-tête obligatoire de TOUTE note de risque
+
+**Chaque note produite doit commencer par ce bandeau, sans exception.** Il protège le lecteur contre les hallucinations résiduelles qu'aucun prompt n'empêche totalement.
+
+> **⚠️ Note de risque transactionnel — vérification finale par le professionnel**
+>
+> Cette grille s'appuie sur les sources officielles consultées via l'API Légifrance. Avant tout usage en négociation ou en signing :
+> 1. **Cliquer sur chaque lien Légifrance** cité pour ouvrir le texte source (article du Code de commerce, jurisprudence Cass. com., etc.).
+> 2. **Lire le titre du texte cible** et vérifier qu'il correspond à la situation visée. Un identifiant Légifrance valide peut renvoyer à un texte d'une autre matière que celle annoncée — le titre seul fait foi.
+> 3. **Confirmer la version en vigueur** à la date de l'opération (les seuils, les conditions d'exonération et la jurisprudence évoluent).
+
+## Self-check final obligatoire — appel de `validate_note`
+
+**Avant de remettre la grille de risque au lecteur, tu DOIS appeler le tool `validate_note` avec ta note finale (markdown complet) en input.** Le tool extrait tous les identifiants Légifrance cités (LEGIARTI, JURITEXT, JORFTEXT, etc.) et vérifie pour chacun (a) son existence, (b) son titre, (c) son rattachement réel (code parent, juridiction…).
+
+Tu traites la réponse :
+
+- **Référence non vérifiable** → tu la retires de la grille ou tu la remplaces par « à confirmer (référence non vérifiée) ».
+- **Référence valide mais mal attribuée** (LEGIARTI d'un autre code, JURITEXT d'une autre matière) → tu la retires et tu cherches la bonne via `legifrance_recherche`, ou tu la remplaces par « à confirmer ».
+- **Référence valide et bien attribuée** → conservée.
+
+Étape non négociable. La grille de risque transactionnel est lue avant un signing — une référence inventée à un article du Code de commerce qui n'existe pas peut conduire à une mauvaise décision contractuelle. Le garde-fou `validate_note` est le filet final, non-LLM.
+
 ## Structure obligatoire
 
 ### 1. Qualification de l'opération

@@ -15,6 +15,7 @@ import { registerGetCirculaire } from "./tools/get-circulaire.js";
 import { registerRecherche } from "./tools/recherche.js";
 import { registerSuggest } from "./tools/suggest.js";
 import { registerCacheClear } from "./tools/cache-clear.js";
+import { registerValidateNote } from "./tools/validate-note.js";
 
 // Re-exports pour les plugins qui veulent un usage avancé.
 export { loadConfig } from "./config.js";
@@ -40,6 +41,7 @@ export {
   registerRecherche,
   registerSuggest,
   registerCacheClear,
+  registerValidateNote,
 };
 
 export interface CreateServerOptions {
@@ -56,8 +58,9 @@ export interface CreatedServer {
 }
 
 /**
- * Crée un MCP server préconfiguré avec les 10 tools Légifrance, le cache SQLite
- * local, le client PISTE OAuth et les handlers de shutdown propre.
+ * Crée un MCP server préconfiguré avec les 11 tools Légifrance (10 d'accès +
+ * `validate_note` de garde-fou anti-hallucination), le cache local et le
+ * client PISTE OAuth, ainsi que les handlers de shutdown propre.
  *
  * Chaque plugin de la suite Berryer (généraliste, affaires, social) appelle
  * cette fonction depuis son propre `mcp-server/src/index.ts`. Le cache et la
@@ -84,6 +87,7 @@ export function createBerryerServer(opts: CreateServerOptions): CreatedServer {
   registerRecherche(server, http);
   registerSuggest(server, http);
   registerCacheClear(server, cache);
+  registerValidateNote(server, http);
 
   const start = async () => {
     const transport = new StdioServerTransport();

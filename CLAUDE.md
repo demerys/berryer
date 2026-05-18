@@ -71,9 +71,9 @@ Repo `demerys/berryer` (privé en beta, public à terme) contient le monorepo en
 - **HTTP 400 avec content-length:0 sur /search** : la passerelle DILA renvoie sporadiquement des 400 vides sur des bodies parfaitement valides (constaté en mai 2026). Durée typique des hoquets : 10-60 sec. Le plugin retry jusqu'à 5 fois avec backoff exponentiel (42 sec total). `PisteApiError` cas 400+empty est explicitement marqué "ce n'est PAS un 403, PAS un problème de credentials" pour empêcher les agents de mal interpréter.
 - **Datacenters multi-routés** : le LB DILA route entre `rbx` (Roubaix) et `sbg` (Strasbourg). Un DC peut être plus instable que l'autre.
 
-## Tools MCP V1 (8 tools)
+## Tools MCP (10 tools)
 
-Légifrance : `legifrance_recherche`, `legifrance_get_article_code`, `legifrance_get_loda`, `legifrance_get_jurisprudence`, `legifrance_get_jorf`. BOFiP : `bofip_recherche`, `bofip_get_document`. Utilitaire : `piste_status`. Détails inputs/outputs/endpoints en §3.4.
+Légifrance (fonds CODE / LODA / JURI / JORF / CIRC / etc.) : `legifrance_recherche`, `legifrance_get_article`, `legifrance_get_code`, `legifrance_get_loda`, `legifrance_get_jurisprudence`, `legifrance_get_jorf`, `legifrance_get_circulaire` (couvre aussi les fiches BOFiP via le préfixe `BOI-…`), `legifrance_suggest`. Utilitaires : `piste_status`, `piste_cache_clear`. Détails inputs/outputs/endpoints en §3.4. NB : il n'y a pas de tools `bofip_*` séparés — l'accès au BOFiP passe par les fonds Légifrance.
 
 Gestion d'erreurs PISTE : 401 → re-auth + 1 retry, 403 → message "souscrire l'API sur dashboard PISTE", 429 → backoff exponentiel 3x, 5xx → 1 retry après 2s. Toujours mentionner "Légifrance/PISTE" dans les messages d'erreur.
 

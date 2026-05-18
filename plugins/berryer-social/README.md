@@ -1,6 +1,6 @@
 # Berryer Social — votre cabinet droit du travail dans Claude
 
-> Plugin spécialisé pour avocats et juristes en droit du travail et droit social : contentieux prud'homal, conventions collectives, représentation du personnel, sécurité sociale. Branché sur Légifrance et KALI via PISTE.
+> Plugin spécialisé pour avocats et juristes en droit du travail : contentieux prud'homal, conventions collectives, représentation du personnel. Branché sur Légifrance et KALI via PISTE.
 
 ## L'équipe
 

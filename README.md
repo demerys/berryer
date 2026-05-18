@@ -1,6 +1,6 @@
 # Berryer — un cabinet juridique virtuel français dans Claude
 
-> Trois plugins Claude (Code, Cowork, Desktop) qui mettent à disposition une équipe de **14 agents juridiques spécialisés**, branchés en direct sur **Légifrance** et le **BOFiP**, sans qu'aucune donnée n'aille sur un serveur tiers.
+> Trois plugins thématiques (généraliste, droit des affaires, droit du travail) pour Claude — compatibles Claude Code, Cowork et Desktop — qui mettent à disposition une équipe de **14 agents juridiques spécialisés**, branchés en direct sur **Légifrance** et le **BOFiP**, sans qu'aucune donnée n'aille sur un serveur tiers.
 
 Édité par [Demerys](https://demerys.com). Site officiel : [berryer-landing.netlify.app](https://berryer-landing.netlify.app/).
 
@@ -18,7 +18,7 @@ Si un agent n'a pas pu vérifier, il le dit explicitement. Pas d'invention, pas 
 
 ### 2. « Je ne peux pas envoyer un dossier client à un service américain »
 
-Le serveur MCP de chaque plugin tourne **localement** sur votre poste. Vos requêtes partent en direct vers `api.piste.gouv.fr` (DILA, opérateur public) avec **vos** credentials PISTE. Demerys n'a **aucune** visibilité, aucune télémétrie, aucun cookie, aucun cache distant. Le code source est ouvert et auditable (~2 000 lignes TypeScript, 42 tests).
+Le serveur MCP de chaque plugin tourne **localement** sur votre poste. Vos requêtes partent en direct vers `api.piste.gouv.fr` (DILA, opérateur public) avec **vos** credentials PISTE. Demerys n'a **aucune** visibilité, aucune télémétrie, aucun cookie, aucun cache distant. Le code source est ouvert et auditable (~2 500 lignes TypeScript, 42 tests).
 
 C'est précisément l'architecture exigée par le secret professionnel (article 226-13 du Code pénal) et la conformité RGPD pour les données clients.
 
@@ -103,9 +103,9 @@ Pour Cowork (parcours UI sans terminal) : voir `plugins/berryer/INSTALL.md`.
 Installation via marketplace Claude Code :
 ```
 /plugin marketplace add demerys/berryer
-/plugin install berryer
-/plugin install berryer-affaires
-/plugin install berryer-social
+/plugin install berryer@berryer-suite
+/plugin install berryer-affaires@berryer-suite
+/plugin install berryer-social@berryer-suite
 ```
 
 ---

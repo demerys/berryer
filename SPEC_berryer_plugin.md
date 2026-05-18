@@ -1,5 +1,19 @@
 # Spec — Plugin Claude `berryer` (Demerys)
 
+> ⚠️ **Document d'archive — spec de la V1 (plugin unique).**
+>
+> Ce document est conservé comme **source historique** : il décrit la conception initiale du plugin unique `berryer`. La suite a évolué vers une **architecture monorepo à 3 plugins thématiques** (`berryer`, `berryer-affaires`, `berryer-social`) avec un noyau partagé `@berryer/core`.
+>
+> Pour l'état actuel (V0.2.0) :
+> - **Architecture, conventions, naming, tools réels** : voir `CLAUDE.md` à la racine.
+> - **Présentation publique** : voir `README.md` à la racine et les `README.md` de chaque plugin.
+>
+> Divergences notables entre ce document et l'implémentation actuelle :
+> - **Tools** : la V1 prévoyait des tools `bofip_recherche` / `bofip_get_document` séparés. Dans l'implémentation actuelle, les fiches BOFiP sont accédées via `legifrance_get_circulaire` (préfixe `BOI-…`) et le fond `CIRC` de `legifrance_recherche`. Le tool `legifrance_get_article_code` mentionné ici a été renommé `legifrance_get_article`. La V0.2.0 expose **10 tools** (voir `CLAUDE.md`), pas 8.
+> - **Périmètre** : la V0.2.0 ajoute deux plugins (`berryer-affaires`, `berryer-social`) absents de la V1, et un noyau partagé `@berryer/core`.
+
+---
+
 > Document de spécification pour le développement du plugin **Berryer** par Demerys, exposant les API Légifrance et BOFiP via PISTE, et embarquant des agents juridiques spécialisés portant les noms de grands juristes français. **Compatible Claude Code ET Claude Cowork** (même plugin, deux modes d'installation). Distribution prévue : marketplace GitHub publique pour cabinets d'avocats et d'expertise comptable.
 
 ## Naming et identité de marque

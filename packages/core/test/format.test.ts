@@ -82,3 +82,24 @@ describe("format — Article mapper", () => {
     expect(summary.dateFin).toBe("2002-01-01");
   });
 });
+
+describe("format — normalizeArticleNum", () => {
+  it("normalise les citations à la française vers le format Légifrance", async () => {
+    const { normalizeArticleNum } = await import("../src/format.js");
+    expect(normalizeArticleNum("L. 145-1")).toBe("L145-1");
+    expect(normalizeArticleNum("L. 64")).toBe("L64");
+    expect(normalizeArticleNum("L. 80 B")).toBe("L80 B");
+    expect(normalizeArticleNum("R*. 196-1")).toBe("R*196-1");
+    expect(normalizeArticleNum("l. 421-1")).toBe("L421-1");
+    expect(normalizeArticleNum("L 64")).toBe("L64");
+  });
+
+  it("laisse inchangés les numéros simples et déjà normalisés", async () => {
+    const { normalizeArticleNum } = await import("../src/format.js");
+    expect(normalizeArticleNum("1240")).toBe("1240");
+    expect(normalizeArticleNum("L64")).toBe("L64");
+    expect(normalizeArticleNum("L145-1")).toBe("L145-1");
+    expect(normalizeArticleNum("119 bis")).toBe("119 bis");
+    expect(normalizeArticleNum("238 quindecies")).toBe("238 quindecies");
+  });
+});

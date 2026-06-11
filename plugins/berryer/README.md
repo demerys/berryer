@@ -75,7 +75,7 @@ Trois méthodes de travail sont chargées automatiquement par les agents quand l
 
 ### Aucune référence inventée
 
-Chaque article cité, chaque arrêt mentionné, chaque fiche BOFiP référencée a été **réellement consultée sur Légifrance** au moment de la réponse. Le plugin a été conçu autour d'un principe : si l'agent n'a pas pu vérifier, il le dit explicitement. Pas d'hallucination déguisée en certitude.
+Chaque article cité, chaque arrêt mentionné, chaque fiche BOFiP référencée a été **réellement consulté à la source officielle** (Légifrance, BOFiP) au moment de la réponse. Le plugin a été conçu autour d'un principe : si l'agent n'a pas pu vérifier, il le dit explicitement. Pas d'hallucination déguisée en certitude.
 
 Concrètement :
 - Tous les schémas de réponse sont calés sur des **captures réelles** de l'API Légifrance (pas sur la doc qui ment), avec 5 fixtures réelles servant de filet anti-régression.
@@ -88,7 +88,7 @@ C'est l'argument central pour avocats et experts-comptables :
 
 - **Vos credentials PISTE** sont stockés dans le **keychain de votre OS** (Keychain macOS, Credential Manager Windows). Ils ne quittent jamais votre poste.
 - **Le serveur MCP du plugin tourne localement** sur votre machine. Aucune intermédiation Demerys ou Anthropic.
-- **Vos requêtes** Légifrance/BOFiP partent **en direct** depuis votre poste vers `api.piste.gouv.fr`. Demerys n'a **aucune visibilité** sur les questions que vous posez à Berryer.
+- **Vos requêtes** partent **en direct** depuis votre poste vers `api.piste.gouv.fr` (Légifrance) et `data.economie.gouv.fr` (BOFiP, open data). Demerys n'a **aucune visibilité** sur les questions que vous posez à Berryer.
 - **Aucune télémétrie**.
 - **Code source ouvert** et auditable.
 
@@ -192,7 +192,7 @@ Voir [INSTALL.md](./INSTALL.md) pour le guide complet en deux parcours :
 - **Parcours A — Cowork (sans terminal)** : `Customize → + → Add marketplace from GitHub → Install`. Recommandé pour avocats / experts-comptables non-tech.
 - **Parcours B — Claude Code (terminal)** : `/plugin marketplace add demerys/berryer` puis `/plugin install berryer@berryer-suite`.
 
-Dans tous les cas, vous aurez besoin d'un compte **PISTE** ([piste.gouv.fr](https://piste.gouv.fr)) avec souscription aux API Légifrance et BOFiP.
+Dans tous les cas, vous aurez besoin d'un compte **PISTE** ([piste.gouv.fr](https://piste.gouv.fr)) avec souscription à l'API Légifrance. Le BOFiP, lui, est interrogé via l'open data DGFiP (data.economie.gouv.fr) — aucune souscription supplémentaire.
 
 ---
 
@@ -202,13 +202,15 @@ Pour les développeurs qui veulent appeler directement les tools sans passer par
 
 | Tool | Description |
 |---|---|
-| `legifrance_recherche` | Recherche unifiée multi-fonds (CODE, LODA, JURI, JORF, **CIRC** pour BOFiP, etc.) |
+| `legifrance_recherche` | Recherche unifiée multi-fonds (CODE, LODA, JURI, JORF, CIRC, etc.) |
 | `legifrance_get_article` | Article d'un code par ID ou par couple code+num |
 | `legifrance_get_code` | Sommaire d'un code |
 | `legifrance_get_loda` | Loi/décret/ordonnance/arrêté complet |
 | `legifrance_get_jurisprudence` | Décision Cass / CE / CA |
 | `legifrance_get_jorf` | Texte du Journal officiel |
-| `legifrance_get_circulaire` | Circulaire ou fiche BOFiP (`BOI-…`) |
+| `legifrance_get_circulaire` | Circulaire administrative (Légifrance) |
+| `bofip_recherche` | Recherche plein texte dans le BOFiP en vigueur (open data DGFiP) |
+| `bofip_get_document` | Fiche BOFiP `BOI-…` en texte intégral (open data DGFiP) |
 | `legifrance_suggest` | Autocomplete cross-fond |
 | `piste_status` | Diagnostic complet (credentials + OAuth + API live) |
 | `piste_cache_clear` | Vide le cache local |
@@ -223,7 +225,7 @@ Cette section répète les engagements en raison de leur importance pour les pro
 >
 > Le serveur MCP du plugin tourne **localement** sur votre machine. **Aucune donnée ne transite** par les serveurs Anthropic ou Demerys.
 >
-> Vos requêtes Légifrance/BOFiP partent **en direct** depuis votre poste vers `api.piste.gouv.fr`. **Demerys n'a aucune visibilité** sur les questions que vous posez ni sur les documents que vous traitez.
+> Vos requêtes partent **en direct** depuis votre poste vers `api.piste.gouv.fr` (Légifrance) et `data.economie.gouv.fr` (BOFiP, open data sans authentification). **Demerys n'a aucune visibilité** sur les questions que vous posez ni sur les documents que vous traitez.
 >
 > Le plugin **n'envoie aucune télémétrie**.
 >

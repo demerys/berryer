@@ -1,7 +1,7 @@
 {
   "name": "berryer",
   "version": "0.1.0",
-  "description": "Berryer — Cabinet juridique virtuel français généraliste dans Claude. 6 agents (Berryer/orchestrateur, Dupin, Cassin, Colbert, Portalis, David) + 3 skills méthodologiques (Domat, Pothier, Gény). Accès Légifrance & BOFiP via PISTE. Pour avocats, juristes et experts-comptables.",
+  "description": "Berryer — Cabinet juridique virtuel français généraliste dans Claude. 6 agents (Berryer/orchestrateur, Dupin, Cassin, Colbert, Portalis, David) + 3 skills méthodologiques (Domat, Pothier, Gény). Accès Légifrance via PISTE & BOFiP via l'open data DGFiP. Pour avocats, juristes et experts-comptables.",
   "author": {
     "name": "DEMERYS INVESTMENT",
     "url": "https://demerys.com"

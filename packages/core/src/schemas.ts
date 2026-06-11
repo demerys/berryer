@@ -374,3 +374,33 @@ export const SuggestResponseSchema = z
   .passthrough();
 
 export type SuggestResponse = z.infer<typeof SuggestResponseSchema>;
+
+/**
+ * Record d'un dataset BOFiP open data (data.economie.gouv.fr, OpenDataSoft).
+ * Forme vérifiée sur réponse réelle le 11 juin 2026 (datasets `bofip-vigueur`
+ * et `bofip-impots`) — cf. fixtures bofip-search-real.json / bofip-doc-real.json.
+ */
+export const BofipRecordSchema = z
+  .object({
+    type: z.string().nullable().optional(),
+    titre: z.string().nullable().optional(),
+    debut_de_validite: z.string().nullable().optional(),
+    serie: z.string().nullable().optional(),
+    division: z.string().nullable().optional(),
+    identifiant_juridique: z.string().nullable().optional(),
+    permalien: z.string().nullable().optional(),
+    contenu: z.string().nullable().optional(),
+    contenu_html: z.string().nullable().optional(),
+  })
+  .passthrough();
+
+export type BofipRecord = z.infer<typeof BofipRecordSchema>;
+
+export const BofipRecordsResponseSchema = z
+  .object({
+    total_count: z.number(),
+    results: z.array(BofipRecordSchema),
+  })
+  .passthrough();
+
+export type BofipRecordsResponse = z.infer<typeof BofipRecordsResponseSchema>;

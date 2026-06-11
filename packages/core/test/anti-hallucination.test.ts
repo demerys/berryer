@@ -177,6 +177,58 @@ describe.skipIf(!HAS_CREDS)("anti-hallucination — validate_note cross-check (l
   }, 30000);
 });
 
+describe.skipIf(!HAS_CREDS)("anti-hallucination — validate_note LEGIARTI (articles de codes)", () => {
+  // Régression du 11 juin 2026 : /consult/getArticle n'a pas de titre
+  // top-level (le code parent est dans article.context.titreTxt[0].titre,
+  // un TABLEAU) — extractTitle/extractScope lisaient des champs inexistants
+  // et flaguaient TOUTE vraie référence LEGIARTI comme non vérifiable.
+
+  it("confirme un vrai LEGIARTI avec son code parent (art. 1240 Code civil)", async () => {
+    const note = "# Note\n\nLa responsabilité délictuelle est posée par l'art. 1240 C. civ (LEGIARTI000032041571).";
+    const { text, isError } = await callValidateNote(note, { code: "Code civil" });
+    expect(isError).toBe(false);
+    expect(text.toLowerCase()).toContain("code civil");
+    expect(text).not.toContain("⚠️ Références non vérifiables");
+  }, 30000);
+
+  it("DÉTECTE un LEGIARTI Code civil annoncé comme article du CGI → piège des branches", async () => {
+    const note = "# Analyse fiscale\n\nLe régime mère-fille est prévu par l'art. 145 CGI (LEGIARTI000032041571).";
+    const { text, isError } = await callValidateNote(note, { code: "Code général des impôts" });
+    expect(isError).toBe(true);
+    expect(text).toContain("PIÈGE DES BRANCHES DÉTECTÉ");
+    expect(text.toLowerCase()).toContain("code civil");
+  }, 30000);
+
+  it("marque comme non vérifiable un LEGIARTI forgé et retourne isError", async () => {
+    const note = "# Note\n\nVoir l'art. 119 bis CGI (LEGIARTI000099999999).";
+    const { text, isError } = await callValidateNote(note, { code: "Code général des impôts" });
+    expect(isError).toBe(true);
+    expect(text).toContain("⚠️ Références non vérifiables");
+    expect(text).toContain("LEGIARTI000099999999");
+  }, 30000);
+});
+
+describe.skipIf(!HAS_CREDS)("anti-hallucination — validate_note BOI (fiches BOFiP via open data)", () => {
+  // Les BOI- ne sont PAS servis par PISTE/Légifrance : validate_note les
+  // vérifie contre l'open data DGFiP (data.economie.gouv.fr).
+
+  it("confirme une vraie fiche BOFiP (BOI-INT-CVB-ITA) avec son titre", async () => {
+    const note = "# Consultation\n\nLa convention franco-italienne est commentée au BOI-INT-CVB-ITA.";
+    const { text, isError } = await callValidateNote(note);
+    expect(isError).toBe(false);
+    expect(text.toLowerCase()).toContain("italie");
+    expect(text).not.toContain("⚠️ Références non vérifiables");
+  }, 30000);
+
+  it("marque comme non vérifiable un BOI forgé et retourne isError", async () => {
+    const note = "# Consultation\n\nVoir BOI-IS-FUS-99-99-99 sur le régime spécial.";
+    const { text, isError } = await callValidateNote(note);
+    expect(isError).toBe(true);
+    expect(text).toContain("⚠️ Références non vérifiables");
+    expect(text).toContain("BOI-IS-FUS-99-99-99");
+  }, 30000);
+});
+
 // Tests purement unitaires (sans réseau) sur l'extraction de patterns.
 // Important même sans creds PISTE : valide la regex.
 describe("anti-hallucination — extraction de patterns (unit)", () => {
@@ -194,8 +246,14 @@ describe("anti-hallucination — extraction de patterns (unit)", () => {
 
   it("la regex BOI capture un BOI-... bien formé", () => {
     const note = "Cf. BOI-IS-BASE-30-30-20-20 sur le régime mère-fille.";
-    const match = note.match(/\bBOI-[A-Z]{2,5}(?:-[A-Z0-9]{1,5}){1,6}\b/);
+    const match = note.match(/\bBOI-[A-Z]{2,5}(?:-[A-Z0-9]{1,6}){1,8}\b/);
     expect(match?.[0]).toBe("BOI-IS-BASE-30-30-20-20");
+  });
+
+  it("la regex BOI capture un rescrit avec segment numérique à 6 chiffres", () => {
+    const note = "Cf. le rescrit BOI-RES-RPPM-000122 sur la retenue à la source.";
+    const match = note.match(/\bBOI-[A-Z]{2,5}(?:-[A-Z0-9]{1,6}){1,8}\b/);
+    expect(match?.[0]).toBe("BOI-RES-RPPM-000122");
   });
 
   it("la regex JORFTEXT capture bien un ID standard", () => {

@@ -5,6 +5,7 @@ import { log } from "./logger.js";
 import { PisteClient } from "./piste-client.js";
 import { PisteHttpClient } from "./http.js";
 import { ResponseCache } from "./cache.js";
+import { BofipClient } from "./bofip.js";
 import { registerStatus } from "./tools/status.js";
 import { registerGetArticle } from "./tools/get-article.js";
 import { registerGetCode } from "./tools/get-code.js";
@@ -16,6 +17,8 @@ import { registerRecherche } from "./tools/recherche.js";
 import { registerSuggest } from "./tools/suggest.js";
 import { registerCacheClear } from "./tools/cache-clear.js";
 import { registerValidateNote } from "./tools/validate-note.js";
+import { registerBofipRecherche } from "./tools/bofip-recherche.js";
+import { registerBofipGetDocument } from "./tools/bofip-get-document.js";
 
 // Re-exports pour les plugins qui veulent un usage avancé.
 export { loadConfig } from "./config.js";
@@ -30,6 +33,8 @@ export {
 export type { HttpClientOptions, RequestOptions } from "./http.js";
 export { ResponseCache, defaultTtlForPath } from "./cache.js";
 export type { CacheStats, CacheOptions } from "./cache.js";
+export { BofipClient, BofipApiError, odsqlString, normalizeBoiId } from "./bofip.js";
+export type { BofipClientOptions } from "./bofip.js";
 export {
   registerStatus,
   registerGetArticle,
@@ -42,6 +47,8 @@ export {
   registerSuggest,
   registerCacheClear,
   registerValidateNote,
+  registerBofipRecherche,
+  registerBofipGetDocument,
 };
 
 export interface CreateServerOptions {
@@ -58,9 +65,10 @@ export interface CreatedServer {
 }
 
 /**
- * Crée un MCP server préconfiguré avec les 11 tools Légifrance (10 d'accès +
- * `validate_note` de garde-fou anti-hallucination), le cache local et le
- * client PISTE OAuth, ainsi que les handlers de shutdown propre.
+ * Crée un MCP server préconfiguré avec 13 tools (10 d'accès Légifrance,
+ * 2 d'accès BOFiP via l'open data DGFiP, et `validate_note` de garde-fou
+ * anti-hallucination), le cache local et le client PISTE OAuth, ainsi que
+ * les handlers de shutdown propre.
  *
  * Chaque plugin de la suite Berryer (généraliste, affaires, social) appelle
  * cette fonction depuis son propre `mcp-server/src/index.ts`. Le cache et la
@@ -74,6 +82,7 @@ export function createBerryerServer(opts: CreateServerOptions): CreatedServer {
   const cache = new ResponseCache({ path: `${config.cacheDir}/cache.db` });
   const auth = new PisteClient(config);
   const http = new PisteHttpClient(config, auth, { cache });
+  const bofip = new BofipClient({ cache });
 
   const server = new McpServer({ name: opts.name, version: opts.version });
 
@@ -87,7 +96,9 @@ export function createBerryerServer(opts: CreateServerOptions): CreatedServer {
   registerRecherche(server, http);
   registerSuggest(server, http);
   registerCacheClear(server, cache);
-  registerValidateNote(server, http);
+  registerValidateNote(server, http, bofip);
+  registerBofipRecherche(server, bofip);
+  registerBofipGetDocument(server, bofip);
 
   const start = async () => {
     const transport = new StdioServerTransport();

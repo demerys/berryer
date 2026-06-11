@@ -19,6 +19,18 @@ export function normalizeLegiDate(d: number | string | null | undefined): string
 }
 
 /**
+ * Normalise un numéro d'article cité « à la française » vers le format de
+ * stockage Légifrance : `L. 145-1` / `l 145-1` → `L145-1`, `R*. 196-1` →
+ * `R*196-1`, `L. 80 B` → `L80 B`. Les numéros simples (`1240`) et déjà
+ * normalisés (`L64`) passent inchangés. L'endpoint
+ * /consult/getArticleWithIdAndNum fait un match exact — sans cette
+ * normalisation, toute citation au format usuel échoue en « introuvable ».
+ */
+export function normalizeArticleNum(num: string): string {
+  return num.trim().replace(/^([a-z])(\*?)[.\s]\s*(?=\S)/i, (_, letter: string, star: string) => letter.toUpperCase() + star);
+}
+
+/**
  * Mapper compact pour un Article Légifrance.
  * Objectif : extraire ce qui est utile au lecteur (Claude / utilisateur final)
  * sans saturer le contexte avec les ~30 champs bruts du Swagger.

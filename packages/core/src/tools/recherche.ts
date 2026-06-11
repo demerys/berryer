@@ -11,13 +11,13 @@ export function registerRecherche(server: McpServer, http: PisteHttpClient) {
   server.registerTool(
     "legifrance_recherche",
     {
-      title: "Recherche unifiée Légifrance + BOFiP",
+      title: "Recherche unifiée Légifrance",
       description: [
         "Recherche dans les bases juridiques françaises via Légifrance. Le paramètre `fond` détermine le périmètre :",
         "- `CODE_DATE` (codes en vigueur à une date), `CODE_ETAT` (codes par état) — *requièrent le paramètre* `code` (ex. `Code civil`)",
         "- `LODA_DATE` / `LODA_ETAT` (lois, décrets, ordonnances, arrêtés)",
         "- `JORF` (Journal officiel), `JURI` (jurisprudence judiciaire), `CETAT` (jurisprudence administrative)",
-        "- `CIRC` (**circulaires & BOFiP** — doctrine fiscale)",
+        "- `CIRC` (circulaires et instructions administratives — le BOFiP n'est PAS dans ce fond : pour la doctrine fiscale, utilisez `bofip_recherche`)",
         "- `CONSTIT` (Conseil constitutionnel), `KALI` (conventions collectives), `ACCO` (accords d'entreprise)",
         "- `ALL` (tous fonds confondus — pratique pour une recherche large)",
         "Retourne les résultats avec titre, identifiant, état (VIGUEUR/ABROGE…), date, extraits du texte, et lien Légifrance.",

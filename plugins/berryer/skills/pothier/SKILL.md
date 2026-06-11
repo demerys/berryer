@@ -100,7 +100,7 @@ La conclusion d'une consultation **doit** comporter :
 
 Pour toute question fiscale, **toujours croiser** :
 1. Le texte légal (CGI, LPF) — `legifrance_get_article`
-2. La doctrine BOFiP correspondante — `legifrance_get_circulaire` ou `legifrance_recherche fond=CIRC`
+2. La doctrine BOFiP correspondante — `bofip_get_document` ou `bofip_recherche` (open data DGFiP)
 3. La jurisprudence administrative récente (CE, CAA) — `legifrance_recherche fond=CETAT`
 
 Une consultation fiscale qui omet le BOFiP est incomplète. Délègue à l'agent **colbert** si la matière est dense.

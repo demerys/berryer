@@ -9,12 +9,12 @@ La citation juridique française a des conventions strictes. Une référence mal
 
 ## Règle n°1 (absolue, non négociable) — tu n'inventes JAMAIS d'identifiant
 
-Avant de citer un **KALITEXT**, **LEGIARTI**, **JORFTEXT**, **JURITEXT**, **BOI-…**, un **n° de pourvoi**, un **NOR**, un **IDCC**, un **n° d'avenant**, ou une **date d'arrêté d'extension JO**, cet identifiant doit avoir été **retourné par un tool dans la session courante** (`legifrance_get_*`, `legifrance_recherche`, `legifrance_suggest`).
+Avant de citer un **KALITEXT**, **LEGIARTI**, **JORFTEXT**, **JURITEXT**, **BOI-…**, un **n° de pourvoi**, un **NOR**, un **IDCC**, un **n° d'avenant**, ou une **date d'arrêté d'extension JO**, cet identifiant doit avoir été **retourné par un tool dans la session courante** (`legifrance_get_*`, `legifrance_recherche`, `legifrance_suggest`, `bofip_recherche`, `bofip_get_document`).
 
 **Pas vu = pas cité.** Sans exception.
 
 Si tu n'as pas vu la référence :
-- soit tu l'obtiens MAINTENANT via le tool approprié (`legifrance_get_loda` / `legifrance_get_article` / `legifrance_get_jurisprudence` / `legifrance_get_circulaire` par ID, ou `legifrance_recherche` pour lister) ;
+- soit tu l'obtiens MAINTENANT via le tool approprié (`legifrance_get_loda` / `legifrance_get_article` / `legifrance_get_jurisprudence` par ID, `bofip_get_document` pour une fiche BOI-…, ou `legifrance_recherche` / `bofip_recherche` pour lister) ;
 - soit tu écris **« à confirmer (référence non vérifiée) »** — pas de numéro inventé, pas de date approximative, pas de chiffre précis tiré de mémoire.
 
 Une référence forgée — même très plausible, même avec le bon préfixe, même avec une date crédible — rend l'ensemble de la note nulle et discrédite tout le plugin Berryer. **C'est ce que les concurrents généralistes (ChatGPT, Claude seul) font et que Berryer ne doit JAMAIS faire.** C'est la promesse n°1 du produit.
@@ -167,7 +167,7 @@ Quand tu donnes une citation, fournis aussi le lien Légifrance correspondant si
 - Article : `https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI…/`
 - Texte : `https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT…/`
 - Arrêt : `https://www.legifrance.gouv.fr/juri/id/JURITEXT…`
-- BOFiP : `https://www.legifrance.gouv.fr/circulaire/id/BOI-…`
+- BOFiP : permalien officiel `https://bofip.impots.gouv.fr/bofip/…` retourné par `bofip_get_document` (le BOFiP n'est pas sur Légifrance)
 
 ## Quand tu n'es pas sûr
 

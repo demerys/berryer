@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
 import { GetArticleResponseSchema } from "../schemas.js";
-import { summarizeArticle, formatArticleAsMarkdown } from "../format.js";
+import { summarizeArticle, formatArticleAsMarkdown, normalizeArticleNum } from "../format.js";
 import { resolveLegitext, listKnownCodes } from "../codes-legitext.js";
 import { log } from "../logger.js";
 
@@ -22,7 +22,7 @@ export function registerGetArticle(server: McpServer, http: PisteHttpClient) {
       inputSchema: {
         articleId: z.string().optional().describe("Identifiant LEGIARTI… de l'article."),
         code: z.string().optional().describe("Nom usuel du code (ex. 'Code civil') ou identifiant LEGITEXT…"),
-        num: z.string().optional().describe("Numéro de l'article (ex. '1240', 'L. 421-1')."),
+        num: z.string().optional().describe("Numéro de l'article (ex. '1240', 'L. 421-1' ou 'L421-1' — les deux formats sont acceptés)."),
       },
     },
     async (args) => {
@@ -54,7 +54,10 @@ export function registerGetArticle(server: McpServer, http: PisteHttpClient) {
             ],
           };
         }
-        raw = await http.post("/consult/getArticleWithIdAndNum", { id: legitext, num: args.num });
+        raw = await http.post("/consult/getArticleWithIdAndNum", {
+          id: legitext,
+          num: normalizeArticleNum(args.num!),
+        });
       }
 
       const parsed = GetArticleResponseSchema.safeParse(raw);

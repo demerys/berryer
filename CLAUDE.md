@@ -2,18 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## État du repo (mai 2026)
+## État du repo (juin 2026)
 
-**Monorepo de la suite Berryer**, contient à terme 3 plugins (généraliste, droit des affaires, droit du travail) qui partagent un `core` commun.
+**Monorepo de la suite Berryer**, contient 4 plugins (généraliste, droit des affaires, droit du travail, fiscalité) qui partagent un `core` commun.
 
 ```
 demerys/berryer/
 ├── packages/core/                # @berryer/core (lib partagée)
 ├── plugins/
-│   ├── berryer/                  # plugin généraliste (Dupin, Cassin, Colbert, Portalis, David)
-│   ├── berryer-affaires/         # à venir M3-M4 (Thaller, Ripert, Houin, Guyon)
-│   └── berryer-social/           # à venir M5-M6 (Durand, Lyon-Caen, Despax, Camerlynck)
-├── .claude-plugin/marketplace.json   # à créer M2
+│   ├── berryer/                  # plugin généraliste (Berryer, Dupin, Cassin, Colbert, Portalis, David)
+│   ├── berryer-affaires/         # droit des affaires (Thaller, Ripert, Houin, Guyon)
+│   ├── berryer-fiscal/           # fiscalité FR + internationale (Cozian, Lauré, Tixier, Trotabas)
+│   └── berryer-social/           # droit du travail (Durand, Lyon-Caen, Despax, Camerlynck)
+├── .claude-plugin/marketplace.json   # liste les 4 plugins
 ├── package.json                  # workspaces npm
 ├── tsconfig.base.json
 └── docs/, scripts/ (dev tools), SPEC_berryer_plugin.md (archive V1)
@@ -23,7 +24,7 @@ demerys/berryer/
 
 ## Identité produit
 
-La suite Berryer est éditée par Demerys pour avocats / juristes / experts-comptables. Chaque plugin expose les API **Légifrance** et **BOFiP** via **PISTE** avec une équipe d'agents juridiques nommés selon des juristes français célèbres. L'utilisateur final fournit **sa propre clé PISTE** — Demerys ne centralise rien (argument RGPD/secret professionnel).
+La suite Berryer est éditée par Demerys pour avocats / juristes / experts-comptables. Chaque plugin expose l'API **Légifrance** via **PISTE** et le **BOFiP** via l'open data DGFiP (data.economie.gouv.fr, sans clé) avec une équipe d'agents juridiques nommés selon des juristes français célèbres. L'utilisateur final fournit **sa propre clé PISTE** — Demerys ne centralise rien (argument RGPD/secret professionnel).
 
 Naming : tous les composants portent le nom de juristes français. Cohérence de marque non négociable. Voir le SPEC pour la liste complète et les biographies courtes.
 
@@ -43,7 +44,7 @@ Le CLAUDE.md utilisateur global décrit une stack Go/Gin/SQLite. **Il ne s'appli
 
 ### Monorepo + plugins indépendants
 
-- `packages/core/` exporte `createBerryerServer({ name, version })` qui fait tout le wiring : config, OAuth PISTE, cache SQLite, registre des 10 tools Légifrance, signal handlers. Sans changement fonctionnel par rapport à V1.
+- `packages/core/` exporte `createBerryerServer({ name, version })` qui fait tout le wiring : config, OAuth PISTE, cache local, registre des 13 tools (Légifrance + BOFiP + validate_note), signal handlers.
 - Chaque `plugins/<nom>/mcp-server/src/index.ts` fait juste `import { createBerryerServer, log } from "@berryer/core"` puis `const { start } = createBerryerServer({ name, version }); start().catch(...)`. ~10 lignes par plugin.
 - Build : `npm run build` à la racine builde `core` puis tous les plugins (workspaces). Au runtime, `node plugins/<nom>/mcp-server/dist/index.js` résout `@berryer/core` via les symlinks workspace dans `node_modules/`.
 
@@ -71,9 +72,9 @@ Repo `demerys/berryer` (privé en beta, public à terme) contient le monorepo en
 - **HTTP 400 avec content-length:0 sur /search** : la passerelle DILA renvoie sporadiquement des 400 vides sur des bodies parfaitement valides (constaté en mai 2026). Durée typique des hoquets : 10-60 sec. Le plugin retry jusqu'à 5 fois avec backoff exponentiel (42 sec total). `PisteApiError` cas 400+empty est explicitement marqué "ce n'est PAS un 403, PAS un problème de credentials" pour empêcher les agents de mal interpréter.
 - **Datacenters multi-routés** : le LB DILA route entre `rbx` (Roubaix) et `sbg` (Strasbourg). Un DC peut être plus instable que l'autre.
 
-## Tools MCP (10 tools)
+## Tools MCP (13 tools)
 
-Légifrance (fonds CODE / LODA / JURI / JORF / CIRC / etc.) : `legifrance_recherche`, `legifrance_get_article`, `legifrance_get_code`, `legifrance_get_loda`, `legifrance_get_jurisprudence`, `legifrance_get_jorf`, `legifrance_get_circulaire` (couvre aussi les fiches BOFiP via le préfixe `BOI-…`), `legifrance_suggest`. Utilitaires : `piste_status`, `piste_cache_clear`. Détails inputs/outputs/endpoints en §3.4. NB : il n'y a pas de tools `bofip_*` séparés — l'accès au BOFiP passe par les fonds Légifrance.
+Légifrance (fonds CODE / LODA / JURI / JORF / CIRC / etc.) : `legifrance_recherche`, `legifrance_get_article`, `legifrance_get_code`, `legifrance_get_loda`, `legifrance_get_jurisprudence`, `legifrance_get_jorf`, `legifrance_get_circulaire` (circulaires administratives uniquement), `legifrance_suggest`. BOFiP : `bofip_recherche`, `bofip_get_document` — via l'**open data DGFiP** (data.economie.gouv.fr, dataset `bofip-vigueur`, sans credentials). **Le BOFiP n'est PAS dans les fonds Légifrance** (vérifié en réel juin 2026 : le fond CIRC ne l'indexe pas, /consult/circulaire 400 sur les ids BOI-) ; la mention contraire du SPEC V0.2.0 est obsolète. Anti-hallucination : `validate_note` (vérifie KALITEXT/LEGIARTI/LEGITEXT/JURITEXT/JORFTEXT via PISTE et BOI- via l'open data). Utilitaires : `piste_status`, `piste_cache_clear`.
 
 Gestion d'erreurs PISTE : 401 → re-auth + 1 retry, 403 → message "souscrire l'API sur dashboard PISTE", 429 → backoff exponentiel 3x, 5xx → 1 retry après 2s. Toujours mentionner "Légifrance/PISTE" dans les messages d'erreur.
 

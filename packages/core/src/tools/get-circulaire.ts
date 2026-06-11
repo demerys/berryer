@@ -23,13 +23,13 @@ export function registerGetCirculaire(server: McpServer, http: PisteHttpClient) 
   server.registerTool(
     "legifrance_get_circulaire",
     {
-      title: "Circulaire ou fiche BOFiP",
+      title: "Circulaire administrative (Légifrance)",
       description:
-        "Récupère une circulaire administrative ou une fiche BOFiP (doctrine fiscale) par son identifiant. Pour les BOFiP, utilisez l'identifiant `BOI-…` (ex. `BOI-IS-BASE-30-30-20-20`). Retourne titre, ministère, état, dates, mots-clés, et le texte intégral.",
+        "Récupère une circulaire ou instruction administrative (circulaires.legifrance.gouv.fr) par son identifiant. Retourne titre, ministère, état, dates, mots-clés, et le texte intégral. ATTENTION : les fiches BOFiP (`BOI-…`) ne sont PAS servies par cet endpoint — utilisez `bofip_get_document`.",
       inputSchema: {
         id: z
           .string()
-          .describe("Identifiant de la circulaire (numéro) ou de la fiche BOFiP (`BOI-…`)."),
+          .describe("Identifiant de la circulaire (numéro Légifrance). Pour une fiche BOFiP `BOI-…`, utilisez `bofip_get_document`."),
       },
     },
     async (args) => {
@@ -49,7 +49,7 @@ export function registerGetCirculaire(server: McpServer, http: PisteHttpClient) 
           content: [
             {
               type: "text",
-              text: `Document introuvable (id "${args.id}"). Pour un BOFiP, vérifiez le format BOI-… (Légifrance/PISTE).`,
+              text: `Document introuvable (id "${args.id}") sur le fond des circulaires Légifrance. S'il s'agit d'une fiche BOFiP (BOI-…), utilisez \`bofip_get_document\`.`,
             },
           ],
         };

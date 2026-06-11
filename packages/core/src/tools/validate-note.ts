@@ -1,6 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { PisteHttpClient } from "../http.js";
+import { BofipClient, odsqlString, normalizeBoiId } from "../bofip.js";
+import { BofipRecordsResponseSchema } from "../schemas.js";
 import { log } from "../logger.js";
 
 type RefType = "KALITEXT" | "LEGIARTI" | "LEGITEXT" | "JURITEXT" | "JORFTEXT" | "BOI";
@@ -29,7 +31,10 @@ const ID_PATTERNS: Array<[RefType, RegExp]> = [
   ["LEGITEXT", /LEGITEXT\d{8,14}/g],
   ["JURITEXT", /JURITEXT\d{8,14}/g],
   ["JORFTEXT", /JORFTEXT\d{8,14}/g],
-  ["BOI", /\bBOI-[A-Z]{2,5}(?:-[A-Z0-9]{1,5}){1,6}\b/g],
+  // Segments de plan : 2-3 chiffres ou mnémoniques courts ; les rescrits
+  // (BOI-RES-…) ont un dernier segment numérique à 6 chiffres. Le suffixe
+  // de version -YYYYMMDD (8 chiffres) reste volontairement hors capture.
+  ["BOI", /\bBOI-[A-Z]{2,5}(?:-[A-Z0-9]{1,6}){1,8}\b/g],
 ];
 
 function extractReferences(note: string): RefMatch[] {
@@ -63,7 +68,7 @@ function urlFor(ref: RefMatch): string {
     case "JURITEXT":
       return `https://www.legifrance.gouv.fr/juri/id/${ref.id}/`;
     case "BOI":
-      return `https://www.legifrance.gouv.fr/circulaire/id/${ref.id}/`;
+      return `https://bofip.impots.gouv.fr/bofip/identifiant=${ref.id}`;
   }
 }
 
@@ -165,13 +170,23 @@ function extractTitle(raw: any, type: RefType): string | undefined {
   if (type === "JURITEXT") {
     return pickString(raw?.text?.titre, raw?.text?.titreLong, raw?.titre);
   }
-  // KALITEXT, LEGITEXT, JORFTEXT, LEGIARTI, BOI : `title` est au top-level
-  // pour la plupart des endpoints (kaliText, lawDecree, jorf, getArticle).
+  if (type === "LEGIARTI") {
+    // /consult/getArticle n'a PAS de titre top-level : le nom du code parent
+    // est dans article.context.titreTxt[0].titre (tableau) ou
+    // article.textTitles[0].titre — vérifié sur réponse réelle (fixture
+    // article-1240-code-civil-real.json).
+    const a = raw?.article;
+    const code = pickString(a?.context?.titreTxt?.[0]?.titre, a?.textTitles?.[0]?.titre);
+    const num = pickString(a?.num);
+    if (code && num) return `${code} — art. ${num}`;
+    return pickString(code, a?.fullSectionsTitre, a?.sectionParentTitre, raw?.title, raw?.titre);
+  }
+  // KALITEXT, LEGITEXT, JORFTEXT, BOI : `title` est au top-level
+  // pour la plupart des endpoints (kaliText, lawDecree, jorf).
   return pickString(
     raw?.title,
     raw?.titre,
     raw?.titreLong,
-    raw?.article?.titre,
     raw?.text?.titre,
     raw?.text?.titreLong,
   );
@@ -203,7 +218,15 @@ function extractScope(raw: any, type: RefType): string | undefined {
     return [j, formation].filter(Boolean).join(" · ") || undefined;
   }
   if (type === "LEGIARTI" || type === "LEGITEXT") {
-    return pickString(raw?.context?.titreTxt?.titre, raw?.article?.context?.titreTxt?.titre);
+    // titreTxt est un TABLEAU dans les réponses réelles ([0].titre = nom du
+    // code parent) ; les formes objet sont gardées par tolérance.
+    return pickString(
+      raw?.article?.context?.titreTxt?.[0]?.titre,
+      raw?.context?.titreTxt?.[0]?.titre,
+      raw?.article?.textTitles?.[0]?.titre,
+      raw?.article?.context?.titreTxt?.titre,
+      raw?.context?.titreTxt?.titre,
+    );
   }
   return undefined;
 }
@@ -232,7 +255,51 @@ function extractSearchable(raw: any, type: RefType): string | undefined {
   return undefined;
 }
 
-async function validateRef(ref: RefMatch, http: PisteHttpClient): Promise<ValidationResult> {
+/**
+ * Vérifie un identifiant BOI-… contre l'open data BOFiP (DGFiP).
+ * Le BOFiP n'est pas servi par PISTE/Légifrance — cf. bofip.ts.
+ */
+async function validateBoiRef(ref: RefMatch, bofip: BofipClient): Promise<ValidationResult> {
+  const fallbackUrl = urlFor(ref);
+  const id = normalizeBoiId(ref.id);
+  try {
+    const raw = await bofip.records("bofip-vigueur", {
+      where: `identifiant_juridique=${odsqlString(id)}`,
+      select: "titre,serie,division,identifiant_juridique,debut_de_validite,permalien",
+      limit: "1",
+    });
+    const parsed = BofipRecordsResponseSchema.safeParse(raw);
+    const rec = parsed.success ? parsed.data.results[0] : undefined;
+    if (rec) {
+      return {
+        id: ref.id,
+        type: ref.type,
+        exists: true,
+        title: rec.titre ?? "(sans titre)",
+        scope: [rec.serie, rec.division].filter(Boolean).join("-") || undefined,
+        url: rec.permalien ?? fallbackUrl,
+      };
+    }
+    return {
+      id: ref.id,
+      type: ref.type,
+      exists: false,
+      url: fallbackUrl,
+      error: "fiche introuvable dans la doctrine BOFiP en vigueur (identifiant forgé ou fiche abrogée)",
+    };
+  } catch (err: any) {
+    const msg = err?.message ? String(err.message) : String(err);
+    return { id: ref.id, type: ref.type, exists: false, url: fallbackUrl, error: msg.slice(0, 240) };
+  }
+}
+
+async function validateRef(
+  ref: RefMatch,
+  http: PisteHttpClient,
+  bofip: BofipClient,
+): Promise<ValidationResult> {
+  if (ref.type === "BOI") return validateBoiRef(ref, bofip);
+
   const url = urlFor(ref);
   let path: string;
   let body: Record<string, string>;
@@ -256,10 +323,6 @@ async function validateRef(ref: RefMatch, http: PisteHttpClient): Promise<Valida
     case "JURITEXT":
       path = "/consult/juri";
       body = { textId: ref.id };
-      break;
-    case "BOI":
-      path = "/consult/circulaire";
-      body = { id: ref.id };
       break;
   }
 
@@ -293,7 +356,7 @@ async function validateRef(ref: RefMatch, http: PisteHttpClient): Promise<Valida
   }
 }
 
-export function registerValidateNote(server: McpServer, http: PisteHttpClient) {
+export function registerValidateNote(server: McpServer, http: PisteHttpClient, bofip: BofipClient) {
   server.registerTool(
     "validate_note",
     {
@@ -360,7 +423,7 @@ export function registerValidateNote(server: McpServer, http: PisteHttpClient) {
       const ctx: ExpectedContext = args.expected_context ?? {};
       const hasCtx = Object.values(ctx).some((v) => typeof v === "string" && v.trim().length > 0);
 
-      const results = await Promise.all(refs.map((r) => validateRef(r, http)));
+      const results = await Promise.all(refs.map((r) => validateRef(r, http, bofip)));
       const crossChecks = results.map((r) => crossCheckContext(r, ctx));
       const ok = results.filter((r) => r.exists);
       const ko = results.filter((r) => !r.exists);

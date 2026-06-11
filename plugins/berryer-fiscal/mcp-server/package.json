@@ -1,0 +1,26 @@
+{
+  "name": "@berryer/plugin-fiscal-server",
+  "version": "0.1.0",
+  "description": "Entrypoint MCP du plugin berryer-fiscal (importe @berryer/core).",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --outfile=dist/index.js --banner:js=\"import { createRequire } from \\\"module\\\"; const require = createRequire(import.meta.url);\"",
+    "dev": "tsc -p . --watch",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "@berryer/core": "*",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
+  "author": "DEMERYS INVESTMENT (https://demerys.com)",
+  "license": "EUPL-1.2"
+}

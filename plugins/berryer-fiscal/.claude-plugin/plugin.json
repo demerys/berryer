@@ -1,0 +1,27 @@
+{
+  "name": "berryer-fiscal",
+  "version": "0.1.0",
+  "description": "Berryer Fiscal — Cabinet virtuel fiscalité française et internationale : agents Cozian (fiscalité des entreprises), Lauré (TVA), Tixier (fiscalité internationale), Trotabas (contrôle et contentieux fiscal). Connecté à Légifrance via PISTE et au BOFiP via l'open data DGFiP.",
+  "author": {
+    "name": "DEMERYS INVESTMENT",
+    "url": "https://demerys.com"
+  },
+  "homepage": "https://berryer-landing.netlify.app/",
+  "repository": "https://github.com/demerys/berryer",
+  "license": "EUPL-1.2",
+  "keywords": [
+    "légifrance",
+    "bofip",
+    "fiscalité",
+    "fiscal",
+    "tva",
+    "fiscalité-internationale",
+    "prix-de-transfert",
+    "contrôle-fiscal",
+    "cgi",
+    "avocat",
+    "expert-comptable",
+    "piste",
+    "berryer"
+  ]
+}

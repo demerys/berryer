@@ -1,6 +1,6 @@
 # Berryer — un cabinet juridique virtuel français dans Claude
 
-> Trois plugins thématiques (généraliste, droit des affaires, droit du travail) pour Claude — compatibles Claude Code, Cowork et Desktop — qui mettent à disposition une équipe de **14 agents juridiques spécialisés**, branchés en direct sur **Légifrance** et le **BOFiP**, sans qu'aucune donnée n'aille sur un serveur tiers.
+> Quatre plugins thématiques (généraliste, droit des affaires, fiscalité, droit du travail) pour Claude — compatibles Claude Code, Cowork et Desktop — qui mettent à disposition une équipe de **18 agents juridiques spécialisés**, branchés en direct sur **Légifrance** et le **BOFiP**, sans qu'aucune donnée n'aille sur un serveur tiers.
 
 Édité par [Demerys](https://demerys.com). Site officiel : [berryer-landing.netlify.app](https://berryer-landing.netlify.app/).
 
@@ -24,13 +24,13 @@ C'est précisément l'architecture exigée par le secret professionnel (article 
 
 ### 3. « Les conventions de citation, les noms d'agents, le format n'ont rien de français »
 
-La suite est conçue par et pour des juristes français. Les agents portent des noms de juristes français (Berryer, Cassin, Colbert, Portalis, Thaller, Ripert, Durand, Lyon-Caen…). Les méthodes (Domat pour la note, Pothier pour la consultation, Gény pour les citations, Demogue pour la note de risque transactionnel, Rouast pour la procédure prud'homale) reprennent les standards de la doctrine française.
+La suite est conçue par et pour des juristes français. Les agents portent des noms de juristes français (Berryer, Cassin, Colbert, Portalis, Thaller, Ripert, Cozian, Lauré, Durand, Lyon-Caen…). Les méthodes (Domat pour la note, Pothier pour la consultation, Gény pour les citations, Demogue pour la note de risque transactionnel, Jèze pour la consultation fiscale, Rouast pour la procédure prud'homale) reprennent les standards de la doctrine française.
 
 Les citations sont rendues dans le format français rigoureux : `Civ. 1re, 12 mars 2024, n° 22-12.345`, `art. L. 225-38 C. com.`, `BOI-IS-BASE-30-30-20-20 §80`, etc.
 
 ---
 
-## Trois plugins, une seule philosophie
+## Quatre plugins, une seule philosophie
 
 ### `berryer` — Cabinet généraliste
 
@@ -49,6 +49,15 @@ Pour avocats spécialisés en M&A, contentieux commercial, droit des sociétés,
 **Skill méthodologique** : Demogue (note de risque transactionnel pour M&A et opérations structurantes).
 
 → [README détaillé](./plugins/berryer-affaires/README.md)
+
+### `berryer-fiscal` — Cabinet fiscaliste
+
+Pour avocats fiscalistes, juristes et experts-comptables : fiscalité des entreprises, TVA, fiscalité internationale, contrôle et contentieux fiscal. Branché sur Légifrance (PISTE) et sur le BOFiP (open data DGFiP, sans clé supplémentaire).
+
+**Équipe (4 agents)** : Cozian (fiscalité des entreprises — IS, restructurations, régimes de faveur), Lauré (TVA — exigibilité, territorialité, déduction), Tixier (fiscalité internationale — conventions bilatérales, établissement stable, prix de transfert, retenues à la source), Trotabas (contrôle et contentieux — LPF, rescrit, garanties du contribuable).
+**Skill méthodologique** : Jèze (consultation fiscale — qualification, régime texte + BOFiP croisés, chiffrage, risques scorés, sécurisation).
+
+→ [README détaillé](./plugins/berryer-fiscal/README.md)
 
 ### `berryer-social` — Cabinet droit du travail
 
@@ -90,11 +99,12 @@ Le code source restera diffusé sous **EUPL-1.2** (gratuit, libre, modifiable da
 git clone https://github.com/demerys/berryer
 cd berryer
 npm install                                         # workspaces
-node plugins/berryer/scripts/setup-credentials.mjs  # une fois, partagé entre les 3 plugins
+node plugins/berryer/scripts/setup-credentials.mjs  # une fois, partagé entre les 4 plugins
 
 # Puis selon votre profil :
 claude --plugin-dir plugins/berryer            # généraliste
 claude --plugin-dir plugins/berryer-affaires   # droit des affaires
+claude --plugin-dir plugins/berryer-fiscal     # fiscalité
 claude --plugin-dir plugins/berryer-social     # droit du travail
 ```
 
@@ -105,6 +115,7 @@ Installation via marketplace Claude Code :
 /plugin marketplace add demerys/berryer
 /plugin install berryer@berryer-suite
 /plugin install berryer-affaires@berryer-suite
+/plugin install berryer-fiscal@berryer-suite
 /plugin install berryer-social@berryer-suite
 ```
 
@@ -119,8 +130,9 @@ demerys/berryer/
 ├── plugins/
 │   ├── berryer/                      # plugin généraliste (6 agents + 3 skills)
 │   ├── berryer-affaires/             # plugin droit des affaires (4 agents + 1 skill)
+│   ├── berryer-fiscal/               # plugin fiscalité FR + internationale (4 agents + 1 skill)
 │   └── berryer-social/               # plugin droit du travail (4 agents + 1 skill)
-├── .claude-plugin/marketplace.json   # liste les 3 plugins
+├── .claude-plugin/marketplace.json   # liste les 4 plugins
 ├── package.json                      # workspaces npm
 └── tsconfig.base.json
 ```
